@@ -5,6 +5,7 @@ import {
   Target,
   HelpCircle,
   Play,
+  Pause,
   Square,
   CheckCircle2,
   Wind,
@@ -19,9 +20,11 @@ import type { Mode } from '../data/modes';
 interface StudioCardProps {
   mode: Mode;
   isPlaying: boolean;
+  isPaused?: boolean;
   isOpening: boolean;
   isBuffering: boolean;
   onTogglePlay: () => void;
+  onEndSession?: () => void;
   onLaunchFullScreen: () => void;
   onOpenSources: () => void;
   onOpenReader: () => void;
@@ -33,9 +36,11 @@ interface StudioCardProps {
 export const StudioCard: React.FC<StudioCardProps> = ({
   mode,
   isPlaying,
+  isPaused,
   isOpening,
   isBuffering,
   onTogglePlay,
+  onEndSession,
   onLaunchFullScreen,
   onOpenSources,
   onOpenReader,
@@ -344,20 +349,27 @@ export const StudioCard: React.FC<StudioCardProps> = ({
         )}
       </div>
 
-      {/* Main Start / Stop Button */}
-      <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between gap-3">
+      {/* Main Start / Pause / Resume / End Button */}
+      <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between gap-2.5">
         <button
           onClick={onTogglePlay}
           className={`flex-1 py-3 rounded-2xl font-orbitron font-extrabold text-xs sm:text-sm tracking-wider uppercase transition-all duration-300 cursor-pointer shadow-lg active:scale-98 flex items-center justify-center gap-2 ${
             isPlaying
-              ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40 hover:bg-rose-500/30'
+              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30'
+              : isPaused
+              ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 hover:from-emerald-400 hover:to-teal-400 shadow-[0_0_20px_rgba(52,211,153,0.35)]'
               : 'bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 hover:from-emerald-400 hover:to-teal-400 shadow-[0_0_20px_rgba(52,211,153,0.35)]'
           }`}
         >
           {isPlaying ? (
             <>
-              <Square className="w-4 h-4 fill-current" />
-              <span>Stop Session</span>
+              <Pause className="w-4 h-4 fill-current" />
+              <span>Pause Session</span>
+            </>
+          ) : isPaused ? (
+            <>
+              <Play className="w-4 h-4 fill-current ml-0.5" />
+              <span>Continue / Resume</span>
             </>
           ) : (
             <>
@@ -366,6 +378,18 @@ export const StudioCard: React.FC<StudioCardProps> = ({
             </>
           )}
         </button>
+
+        {/* End Session Button when playing or paused */}
+        {(isPlaying || isPaused) && onEndSession && (
+          <button
+            onClick={onEndSession}
+            title="End session and reset to start"
+            className="px-3.5 py-3 rounded-2xl font-orbitron font-bold text-xs uppercase bg-rose-500/15 text-rose-300 border border-rose-500/35 hover:bg-rose-500/25 transition-all cursor-pointer flex items-center gap-1.5 shrink-0"
+          >
+            <Square className="w-3.5 h-3.5 fill-current" />
+            <span className="hidden sm:inline">End</span>
+          </button>
+        )}
       </div>
     </div>
   );
