@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Play, Square, Headphones, Sparkles, BookOpen, Clock, ChevronUp, Check, RotateCcw } from 'lucide-react';
+import { Play, Pause, Square, Headphones, Sparkles, BookOpen, Clock, ChevronUp, Check, RotateCcw } from 'lucide-react';
 import type { Mode } from '../data/modes';
 
 interface LiquidAudioDockProps {
   currentMode: Mode;
   isPlaying: boolean;
+  isPaused?: boolean;
   isOpening: boolean;
   isBuffering: boolean;
   activeSurahNumber: number;
@@ -15,6 +16,7 @@ interface LiquidAudioDockProps {
   currentSunnahIteration: number;
   onSetTimerPreset: (preset: string) => void;
   onTogglePlay: () => void;
+  onEndSession?: () => void;
   onBinauralVolumeChange: (vol: number) => void;
   onQuranVolumeChange: (vol: number) => void;
   onOpenReader: () => void;
@@ -23,6 +25,7 @@ interface LiquidAudioDockProps {
 export const LiquidAudioDock: React.FC<LiquidAudioDockProps> = ({
   currentMode,
   isPlaying,
+  isPaused = false,
   isOpening,
   isBuffering,
   activeSurahNumber,
@@ -33,6 +36,7 @@ export const LiquidAudioDock: React.FC<LiquidAudioDockProps> = ({
   currentSunnahIteration,
   onSetTimerPreset,
   onTogglePlay,
+  onEndSession,
   onBinauralVolumeChange,
   onQuranVolumeChange,
   onOpenReader,
@@ -72,22 +76,37 @@ export const LiquidAudioDock: React.FC<LiquidAudioDockProps> = ({
       {/* Row 1 on Mobile / Left on Desktop: Play/Pause circular button + Track info */}
       <div className="flex items-center gap-2.5 sm:gap-3.5 w-full md:w-auto justify-between md:justify-start">
         <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-          {/* Main Play/Pause Button (44px min target) */}
+          {/* Main Play/Pause (or Resume) Button (44px min target) */}
           <button
             onClick={onTogglePlay}
-            aria-label={isPlaying ? 'Stop session' : 'Start session'}
+            aria-label={isPlaying ? 'Pause session' : isPaused ? 'Resume session' : 'Start session'}
+            title={isPlaying ? 'Pause session' : isPaused ? 'Resume session' : 'Start session'}
             className={`w-11 h-11 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg active:scale-95 shrink-0 ${
               isPlaying
-                ? 'bg-rose-500/20 text-rose-300 border border-rose-500/50 hover:bg-rose-500/30'
+                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/50 hover:bg-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.3)]'
+                : isPaused
+                ? 'bg-emerald-500/30 text-emerald-300 border border-emerald-400/60 hover:bg-emerald-500/40 animate-pulse'
                 : 'bg-gradient-to-tr from-emerald-400 to-teal-400 text-slate-950 font-bold hover:scale-105 shadow-[0_0_15px_rgba(52,211,153,0.4)]'
             }`}
           >
             {isPlaying ? (
-              <Square className="w-4 h-4 fill-current" />
+              <Pause className="w-4 h-4 fill-current" />
             ) : (
               <Play className="w-4 h-4 fill-current ml-0.5" />
             )}
           </button>
+
+          {/* End / Reset Session Button if active or paused */}
+          {(isPlaying || isPaused) && onEndSession && (
+            <button
+              onClick={onEndSession}
+              aria-label="End session"
+              title="End / Reset session"
+              className="w-8 h-8 rounded-full flex items-center justify-center bg-rose-500/20 text-rose-300 border border-rose-500/40 hover:bg-rose-500/30 transition-all cursor-pointer active:scale-95 shrink-0"
+            >
+              <Square className="w-3.5 h-3.5 fill-current" />
+            </button>
+          )}
 
           {/* Mode & Streaming Status */}
           <div className="text-left min-w-0">
@@ -109,6 +128,10 @@ export const LiquidAudioDock: React.FC<LiquidAudioDockProps> = ({
                 <span className="text-amber-300 font-semibold flex items-center gap-1">
                   <Sparkles className="w-3 h-3 animate-spin shrink-0" />
                   Golden Tone 432 · Bismillah...
+                </span>
+              ) : isPaused ? (
+                <span className="text-amber-400 font-medium">
+                  ⏸ Paused (Click play to continue recitation)
                 </span>
               ) : isPlaying ? (
                 <span className="text-emerald-400 font-medium">

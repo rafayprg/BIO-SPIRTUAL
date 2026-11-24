@@ -24,6 +24,7 @@ export const App: React.FC = () => {
     MODES.find((m) => m.id === 'mind-reset') || MODES[1]
   );
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [isPaused, setIsPaused] = useState<boolean>(false);
   const [isOpening, setIsOpening] = useState<boolean>(false);
   const [isBuffering, setIsBuffering] = useState<boolean>(false);
   const [activeSurahIndex, setActiveSurahIndex] = useState<number>(0);
@@ -93,7 +94,7 @@ export const App: React.FC = () => {
 
   // Live Session Countdown & 3s Smooth Auto-Fade Completion
   useEffect(() => {
-    if (!isPlaying || timerMode === 'loop') return;
+    if (!isPlaying || isPaused || timerMode === 'loop') return;
 
     const timer = setInterval(() => {
       setRemainingTimerSeconds((prev) => {
@@ -101,6 +102,7 @@ export const App: React.FC = () => {
           // Smooth 3s auto-fade completion
           audioEngineRef.current?.fadeStopSession(3, () => {
             setIsPlaying(false);
+            setIsPaused(false);
             setIsFullScreenSession(false);
           });
           setToastMessage('Session Complete · May it bring peace and barakah.');
@@ -112,7 +114,7 @@ export const App: React.FC = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [isPlaying, timerMode]);
+  }, [isPlaying, isPaused, timerMode]);
 
   // Change or override session timer preset
   const handleSetTimerPreset = (preset: string) => {
@@ -139,6 +141,7 @@ export const App: React.FC = () => {
     setActiveSurahIndex(0);
     setCurrentAyahIndex(0);
     setCurrentSunnahIteration(1);
+    setIsPaused(false);
 
     if (timerMode === 'default' || timerMode === 'sunnah') {
       setRemainingTimerSeconds(mode.sessionDefaults.defaultMinutes * 60);
@@ -163,6 +166,7 @@ export const App: React.FC = () => {
       setIsQuranPlaying(true);
       setIsFrequencyPlaying(true);
       setIsPlaying(true);
+      setIsPaused(false);
       audioEngineRef.current.startSession(
         targetMode.carrierHz,
         targetMode.beatHz,
@@ -175,27 +179,39 @@ export const App: React.FC = () => {
   };
 
   const handleLaunchFullScreen = () => {
-    if (!isPlaying) {
+    if (!isPlaying && !isPaused) {
       handleStartSession(selectedMode);
     } else {
       setIsFullScreenSession(true);
     }
   };
 
+  const handleTogglePauseResume = () => {
+    if (!audioEngineRef.current) return;
+    if (isPlaying) {
+      audioEngineRef.current.pauseSession();
+      setIsPlaying(false);
+      setIsPaused(true);
+    } else if (isPaused) {
+      audioEngineRef.current.resumeSession();
+      setIsPlaying(true);
+      setIsPaused(false);
+    } else {
+      handleStartSession(selectedMode);
+    }
+  };
+
   const handleEndSession = () => {
     audioEngineRef.current?.stopSession();
     setIsPlaying(false);
+    setIsPaused(false);
     setIsFullScreenSession(false);
     setRemainingTimerSeconds(selectedMode.sessionDefaults.defaultMinutes * 60);
     setCurrentSunnahIteration(1);
   };
 
   const handleTogglePlay = () => {
-    if (isPlaying) {
-      handleEndSession();
-    } else {
-      handleStartSession(selectedMode);
-    }
+    handleTogglePauseResume();
   };
 
   const handleToggleQuran = () => {
@@ -384,9 +400,11 @@ export const App: React.FC = () => {
               <StudioCard
                 mode={selectedMode}
                 isPlaying={isPlaying}
+                isPaused={isPaused}
                 isOpening={isOpening}
                 isBuffering={isBuffering}
                 onTogglePlay={handleTogglePlay}
+                onEndSession={handleEndSession}
                 onLaunchFullScreen={handleLaunchFullScreen}
                 onOpenSources={() => setIsVerifiedSourcesOpen(true)}
                 onOpenReader={() => setIsReaderOpen(true)}
@@ -427,6 +445,7 @@ export const App: React.FC = () => {
             <LiquidAudioDock
               currentMode={selectedMode}
               isPlaying={isPlaying}
+              isPaused={isPaused}
               isOpening={isOpening}
               isBuffering={isBuffering}
               activeSurahNumber={selectedMode.surahNumbers[activeSurahIndex] || selectedMode.surahNumbers[0]}
@@ -437,6 +456,7 @@ export const App: React.FC = () => {
               currentSunnahIteration={currentSunnahIteration}
               onSetTimerPreset={handleSetTimerPreset}
               onTogglePlay={handleTogglePlay}
+              onEndSession={handleEndSession}
               onBinauralVolumeChange={setBinauralVolume}
               onQuranVolumeChange={setQuranVolume}
               onOpenReader={() => setIsReaderOpen(true)}
@@ -451,6 +471,7 @@ export const App: React.FC = () => {
           <LiquidAudioDock
             currentMode={selectedMode}
             isPlaying={isPlaying}
+            isPaused={isPaused}
             isOpening={isOpening}
             isBuffering={isBuffering}
             activeSurahNumber={selectedMode.surahNumbers[activeSurahIndex] || selectedMode.surahNumbers[0]}
@@ -461,6 +482,7 @@ export const App: React.FC = () => {
             currentSunnahIteration={currentSunnahIteration}
             onSetTimerPreset={handleSetTimerPreset}
             onTogglePlay={handleTogglePlay}
+            onEndSession={handleEndSession}
             onBinauralVolumeChange={setBinauralVolume}
             onQuranVolumeChange={setQuranVolume}
             onOpenReader={() => setIsReaderOpen(true)}
@@ -477,11 +499,14 @@ export const App: React.FC = () => {
           currentAyahIndex={currentAyahIndex}
           isQuranPlaying={isQuranPlaying}
           isFrequencyPlaying={isFrequencyPlaying}
+          isPlaying={isPlaying}
+          isPaused={isPaused}
           timerMode={timerMode}
           remainingSeconds={remainingTimerSeconds}
           currentSunnahIteration={currentSunnahIteration}
           onToggleQuran={handleToggleQuran}
           onToggleFrequency={handleToggleFrequency}
+          onTogglePauseResume={handleTogglePauseResume}
           onEndSession={handleEndSession}
           onMinimize={() => setIsFullScreenSession(false)}
         />

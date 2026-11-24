@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { Mode } from '../data/modes';
-import { Play, Pause, Square, Minimize2 } from 'lucide-react';
+import { Play, Pause, Square, Minimize2, BookOpen } from 'lucide-react';
+import { useSurahAyahs } from '../hooks/useSurahAyahs';
 
 interface ActiveSessionViewProps {
   mode: Mode;
@@ -9,11 +10,14 @@ interface ActiveSessionViewProps {
   currentAyahIndex: number;
   isQuranPlaying: boolean;
   isFrequencyPlaying: boolean;
+  isPlaying: boolean;
+  isPaused: boolean;
   timerMode?: string;
   remainingSeconds?: number;
   currentSunnahIteration?: number;
   onToggleQuran: () => void;
   onToggleFrequency: () => void;
+  onTogglePauseResume: () => void;
   onEndSession: () => void;
   onMinimize?: () => void;
 }
@@ -25,11 +29,14 @@ export const ActiveSessionView: React.FC<ActiveSessionViewProps> = ({
   currentAyahIndex,
   isQuranPlaying,
   isFrequencyPlaying,
+  isPlaying,
+  isPaused,
   timerMode,
   remainingSeconds,
   currentSunnahIteration,
   onToggleQuran,
   onToggleFrequency,
+  onTogglePauseResume,
   onEndSession,
   onMinimize,
 }) => {
@@ -38,6 +45,8 @@ export const ActiveSessionView: React.FC<ActiveSessionViewProps> = ({
   const [breathCount, setBreathCount] = useState<number>(4);
 
   useEffect(() => {
+    if (isPaused) return;
+
     let count = 4;
     let phase: 'in' | 'hold1' | 'out' | 'hold2' = 'in';
 
@@ -63,7 +72,10 @@ export const ActiveSessionView: React.FC<ActiveSessionViewProps> = ({
     }, 1000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [isPaused]);
+
+  const activeSurahNumber = mode.surahNumbers[activeSurahIndex] || mode.surahNumbers[0];
+  const { ayahs } = useSurahAyahs(activeSurahNumber);
 
   const currentSurahTotalAyahs = mode.totalAyahs[activeSurahIndex] || mode.totalAyahs[0];
   const currentSurahName = activeSurahIndex === 1 && mode.id === 'crypto-trading' ? 'An-Nas' : mode.surahDisplay.split('+')[0].trim();
@@ -73,18 +85,23 @@ export const ActiveSessionView: React.FC<ActiveSessionViewProps> = ({
   const rightEar = (mode.carrierHz + mode.beatHz).toFixed(2);
   const beat = mode.beatHz.toFixed(2);
 
+  // Current live Ayah data from cache or network
+  const currentAyah = currentAyahIndex > 0 && ayahs.length >= currentAyahIndex
+    ? ayahs[currentAyahIndex - 1]
+    : null;
+
   // Breathing pacer text
   const getBreathText = () => {
+    if (isPaused) return 'Session Paused';
     if (breathPhase === 'in') return `Breathe in ... ${breathCount}`;
     if (breathPhase === 'hold1') return `Hold ... ${breathCount}`;
     if (breathPhase === 'out') return `Breathe out ... ${breathCount}`;
     return `Hold ... ${breathCount}`;
   };
 
-  // Breathing circle scale & glow
-  const isExpanding = breathPhase === 'in';
-  const isFull = breathPhase === 'hold1';
-  const isContracting = breathPhase === 'out';
+  const isExpanding = breathPhase === 'in' && !isPaused;
+  const isFull = breathPhase === 'hold1' && !isPaused;
+  const isContracting = breathPhase === 'out' && !isPaused;
 
   return (
     <div className="fixed inset-0 z-50 bg-[#07111c] text-slate-100 flex flex-col justify-between items-center select-none overflow-hidden animate-in fade-in duration-500">
@@ -100,42 +117,42 @@ export const ActiveSessionView: React.FC<ActiveSessionViewProps> = ({
       />
 
       {/* Top Header & Status */}
-      <div className="relative z-10 w-full pt-4 sm:pt-6 px-4 flex flex-col items-center text-center">
+      <div className="relative z-10 w-full pt-3 sm:pt-5 px-4 flex flex-col items-center text-center">
         {/* Minimize Button */}
         {onMinimize && (
           <button
             onClick={onMinimize}
             title="Minimize to Dashboard"
-            className="absolute top-4 right-4 sm:top-6 sm:right-6 px-3 py-1.5 rounded-full bg-slate-900/80 hover:bg-slate-800 border border-slate-700/80 text-[11px] font-orbitron font-semibold text-slate-300 hover:text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-md"
+            className="absolute top-3 right-3 sm:top-5 sm:right-6 px-3 py-1.5 rounded-full bg-slate-900/80 hover:bg-slate-800 border border-slate-700/80 text-[11px] font-orbitron font-semibold text-slate-300 hover:text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-md"
           >
             <span className="hidden sm:inline">Dashboard</span>
             <Minimize2 className="w-3.5 h-3.5" />
           </button>
         )}
 
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold uppercase font-orbitron tracking-super-wide text-slate-100 drop-shadow-[0_0_15px_rgba(34,211,238,0.4)]">
+        <h1 className="text-lg sm:text-2xl md:text-3xl font-extrabold uppercase font-orbitron tracking-super-wide text-slate-100 drop-shadow-[0_0_15px_rgba(34,211,238,0.4)]">
           BIO SPIRITUAL HACKING
         </h1>
 
         {/* Status Pill */}
-        <div className="mt-2.5 inline-flex flex-col sm:flex-row items-center gap-1.5 sm:gap-2 px-4 py-1.5 rounded-full bg-slate-900/90 border border-slate-700/80 shadow-md">
+        <div className="mt-2 inline-flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 px-3.5 py-1 rounded-full bg-slate-900/90 border border-slate-700/80 shadow-md">
           <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-            <span className="text-[11px] font-orbitron font-semibold tracking-wider text-amber-300">
-              {isOpening ? 'φ GOLDEN RATIO 432 · BISMILLAH' : 'STREAMING QURAN (TARTEEL)'}
+            <span className={`w-2 h-2 rounded-full ${isPaused ? 'bg-amber-400' : isPlaying ? 'bg-emerald-400 animate-ping' : 'bg-slate-400'}`} />
+            <span className="text-[10.5px] font-orbitron font-semibold tracking-wider text-amber-300">
+              {isPaused ? 'SESSION PAUSED' : isOpening ? 'φ GOLDEN RATIO 432 · BISMILLAH' : 'STREAMING QURAN (TARTEEL)'}
             </span>
           </div>
 
-          <span className="hidden sm:inline text-slate-600">·</span>
+          <span className="text-slate-600">·</span>
 
-          <span className="text-[11px] text-slate-300 font-medium">
-            Goal: <span className="text-cyan-300 font-semibold">{mode.name}</span> · {mode.band} · {mode.beatHz} Hz · 📖 {mode.surahDisplay}
+          <span className="text-[10.5px] text-slate-300 font-medium">
+            Goal: <span className="text-cyan-300 font-semibold">{mode.name}</span>
           </span>
 
           {remainingSeconds !== undefined && (
             <>
-              <span className="hidden sm:inline text-slate-600">·</span>
-              <span className="text-[11px] font-mono font-bold text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-400/30">
+              <span className="text-slate-600">·</span>
+              <span className="text-[10.5px] font-mono font-bold text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-400/30">
                 ⏱ {timerMode === 'loop' ? '∞ Loop' : timerMode === 'sunnah' && mode.sessionDefaults.sunnahRepeatCount ? `Sunnah ${currentSunnahIteration || 1}/${mode.sessionDefaults.sunnahRepeatCount}` : `${Math.floor(remainingSeconds / 60)}:${(remainingSeconds % 60) < 10 ? '0' : ''}${remainingSeconds % 60} left`}
               </span>
             </>
@@ -144,11 +161,13 @@ export const ActiveSessionView: React.FC<ActiveSessionViewProps> = ({
       </div>
 
       {/* Center Sacred Geometry Mandala & Breathing Pacer */}
-      <div className="relative z-10 my-auto flex items-center justify-center w-full max-w-xl aspect-square max-h-[50vh] sm:max-h-[54vh]">
+      <div className="relative z-10 my-auto flex items-center justify-center w-full max-w-lg aspect-square max-h-[42vh] sm:max-h-[46vh]">
         {/* Animated Rotating Sacred Geometry Mandala SVG */}
         <svg
           viewBox="0 0 600 600"
-          className="absolute inset-0 w-full h-full animate-[spin_60s_linear_infinite] opacity-90 transition-transform duration-700 pointer-events-none"
+          className={`absolute inset-0 w-full h-full transition-all duration-700 pointer-events-none ${
+            isPaused ? 'opacity-50' : 'animate-[spin_60s_linear_infinite] opacity-90'
+          }`}
         >
           <g transform="translate(300, 300)" stroke="currentColor" fill="none">
             {/* Concentric Circles */}
@@ -171,73 +190,25 @@ export const ActiveSessionView: React.FC<ActiveSessionViewProps> = ({
               />
             ))}
 
-            {/* Mode-Specific Sacred Stars / Petals */}
-            {mode.mandalaTheme === 'emerald' ? (
-              // Organic Floral / Leaf Sacred Geometry (for Jealousy & Anxiety)
-              <g stroke="rgba(16, 185, 129, 0.75)" strokeWidth="1.4">
-                {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((deg) => (
-                  <path
-                    key={deg}
-                    d="M0,0 Q60,110 0,220 Q-60,110 0,0"
-                    transform={`rotate(${deg})`}
-                    fill="rgba(16, 185, 129, 0.04)"
+            {/* 8-Pointed & 16-Pointed Islamic Geometric Stars */}
+            <path
+              d="M0,-240 L60,-170 L170,-170 L170,-60 L240,0 L170,60 L170,170 L60,170 L0,240 L-60,170 L-170,170 L-170,60 L-240,0 L-170,-60 L-170,-170 L-60,-170 Z"
+              stroke="rgba(245, 158, 11, 0.75)"
+              strokeWidth="1.5"
+              fill="rgba(245, 158, 11, 0.03)"
+            />
+            {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => (
+              <g key={deg} transform={`rotate(${deg})`}>
+                <g transform="translate(0, -180) scale(0.28)">
+                  <polygon
+                    points="0,-35 8,-12 35,-12 14,4 22,28 0,14 -22,28 -14,4 -35,-12 -8,-12"
+                    fill="rgba(34, 211, 238, 0.75)"
+                    stroke="#22d3ee"
+                    strokeWidth="1"
                   />
-                ))}
-                {/* Secondary leaves */}
-                {[15, 45, 75, 105, 135, 165, 195, 225, 255, 285, 315, 345].map((deg) => (
-                  <path
-                    key={deg}
-                    d="M0,0 Q35,70 0,140 Q-35,70 0,0"
-                    transform={`rotate(${deg})`}
-                    stroke="rgba(245, 158, 11, 0.7)"
-                    fill="rgba(245, 158, 11, 0.05)"
-                  />
-                ))}
+                </g>
               </g>
-            ) : (
-              // 8-Pointed & 16-Pointed Islamic Geometric Stars (for Crypto & Mind Reset)
-              <g>
-                {/* Golden 8-pointed star */}
-                <path
-                  d="M0,-240 L60,-170 L170,-170 L170,-60 L240,0 L170,60 L170,170 L60,170 L0,240 L-60,170 L-170,170 L-170,60 L-240,0 L-170,-60 L-170,-170 L-60,-170 Z"
-                  stroke="rgba(245, 158, 11, 0.75)"
-                  strokeWidth="1.5"
-                  fill="rgba(245, 158, 11, 0.03)"
-                />
-                {/* Cyan 16-pointed inner stars */}
-                {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => (
-                  <g key={deg} transform={`rotate(${deg})`}>
-                    {/* Star at radius 180 */}
-                    <g transform="translate(0, -180) scale(0.28)">
-                      <polygon
-                        points="0,-35 8,-12 35,-12 14,4 22,28 0,14 -22,28 -14,4 -35,-12 -8,-12"
-                        fill="rgba(34, 211, 238, 0.75)"
-                        stroke="#22d3ee"
-                        strokeWidth="1"
-                      />
-                    </g>
-                    {/* Star at radius 120 */}
-                    <g transform="translate(0, -120) scale(0.22)">
-                      <polygon
-                        points="0,-35 8,-12 35,-12 14,4 22,28 0,14 -22,28 -14,4 -35,-12 -8,-12"
-                        fill="rgba(251, 191, 36, 0.85)"
-                        stroke="#f59e0b"
-                        strokeWidth="1"
-                      />
-                    </g>
-                    {/* Outer Star at radius 240 */}
-                    <g transform="translate(0, -240) scale(0.35)">
-                      <polygon
-                        points="0,-35 8,-12 35,-12 14,4 22,28 0,14 -22,28 -14,4 -35,-12 -8,-12"
-                        fill="rgba(254, 240, 138, 0.85)"
-                        stroke="#eab308"
-                        strokeWidth="1"
-                      />
-                    </g>
-                  </g>
-                ))}
-              </g>
-            )}
+            ))}
           </g>
         </svg>
 
@@ -252,50 +223,84 @@ export const ActiveSessionView: React.FC<ActiveSessionViewProps> = ({
               ? 'scale-90 shadow-[0_0_25px_rgba(34,211,238,0.25)]'
               : 'scale-90 shadow-[0_0_20px_rgba(34,211,238,0.2)]'
           }`}
-          style={{ width: '180px', height: '180px' }}
+          style={{ width: '160px', height: '160px' }}
         >
-          <div className="absolute inset-0 rounded-full bg-slate-950/75 border border-cyan-400/40 backdrop-blur-sm" />
+          <div className="absolute inset-0 rounded-full bg-slate-950/80 border border-cyan-400/40 backdrop-blur-sm" />
           
-          {/* Breathing Text */}
           <div className="relative z-10 text-center px-2">
-            <span className="text-sm sm:text-base font-orbitron font-semibold tracking-wider text-cyan-200 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]">
+            <span className="text-xs sm:text-sm font-orbitron font-semibold tracking-wider text-cyan-200 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]">
               {getBreathText()}
             </span>
           </div>
         </div>
       </div>
 
-      {/* Recitation Banner Pill */}
-      <div className="relative z-10 mb-4 px-4 w-full flex justify-center">
-        <div className="px-5 py-2 rounded-full bg-slate-900/90 border border-slate-700/80 shadow-lg flex items-center justify-center gap-2">
+      {/* LIVE AYAT DISPLAY CARD */}
+      <div className="relative z-20 w-full max-w-2xl px-3 my-1">
+        <div className="w-full liquid-glass-card rounded-2xl px-4 py-3 sm:px-6 sm:py-3.5 border border-amber-400/35 shadow-2xl backdrop-blur-xl text-center">
           {isOpening ? (
-            <span className="font-arabic text-amber-300 text-lg sm:text-xl font-bold tracking-wide">
-              أَعُوذُ بِٱللَّهِ مِنَ ٱلشَّيْطَانِ ٱلرَّجِيمِ
-            </span>
+            <div>
+              <div className="text-[10px] font-orbitron font-bold uppercase tracking-wider text-amber-400 mb-1">
+                TA'AWWUDH (REPUTATION OF REFUGE)
+              </div>
+              <div className="font-arabic text-xl sm:text-2xl font-bold text-amber-300 tracking-wide" dir="rtl">
+                أَعُوذُ بِٱللَّهِ مِنَ ٱلشَّيْطَانِ ٱلرَّجِيمِ
+              </div>
+              <div className="text-[11px] sm:text-xs text-white/60 italic mt-1">
+                "I seek refuge in Allah from Satan, the accursed."
+              </div>
+            </div>
           ) : currentAyahIndex === 0 ? (
-            <span className="font-arabic text-amber-300 text-lg sm:text-xl font-bold tracking-wide">
-              {currentSurahName} · بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
-            </span>
+            <div>
+              <div className="text-[10px] font-orbitron font-bold uppercase tracking-wider text-amber-400 mb-1">
+                BISMILLAH · SURAH {currentSurahName.toUpperCase()}
+              </div>
+              <div className="font-arabic text-xl sm:text-2xl font-bold text-amber-300 tracking-wide" dir="rtl">
+                بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
+              </div>
+              <div className="text-[11px] sm:text-xs text-white/60 italic mt-1">
+                "In the name of Allah, the Entirely Merciful, the Especially Merciful."
+              </div>
+            </div>
           ) : (
-            <div className="flex items-center gap-2 text-xs sm:text-sm font-medium">
-              <span className="text-slate-400">📖</span>
-              <span className="text-slate-100 font-semibold">{currentSurahName}</span>
-              <span className="font-arabic text-amber-300 text-base font-bold">{currentSurahArabic}</span>
-              <span className="text-slate-500">·</span>
-              <span className="text-cyan-300 font-mono">
-                ayah {currentAyahIndex}/{currentSurahTotalAyahs}
-              </span>
+            <div>
+              {/* Surah Header Pill */}
+              <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-white/10 text-xs">
+                <span className="text-amber-300 font-bold flex items-center gap-1.5">
+                  <BookOpen className="w-3.5 h-3.5 text-amber-400" />
+                  <span>{currentSurahName}</span>
+                  <span className="font-arabic text-sm text-amber-200">{currentSurahArabic}</span>
+                </span>
+                <span className="text-cyan-300 font-mono font-bold text-[11px] bg-cyan-500/15 px-2 py-0.5 rounded-full border border-cyan-400/30">
+                  Ayah {currentAyahIndex} of {currentSurahTotalAyahs}
+                </span>
+              </div>
+
+              {/* Live Arabic Verse Text */}
+              <div
+                className="font-arabic text-xl sm:text-2xl md:text-3xl font-extrabold text-amber-200 leading-relaxed py-1 select-text"
+                dir="rtl"
+              >
+                {currentAyah ? currentAyah.arabicText : `${currentSurahArabic} — Ayah ${currentAyahIndex}`}
+              </div>
+
+              {/* Translation Meaning */}
+              {currentAyah && currentAyah.translation && (
+                <div className="text-[11px] sm:text-xs text-slate-300 italic pt-1.5 border-t border-white/5 line-clamp-2">
+                  "{currentAyah.translation}"
+                </div>
+              )}
             </div>
           )}
         </div>
       </div>
 
-      {/* Real-time Frequency HUD Boxes & Control Buttons */}
-      <div className="relative z-10 w-full max-w-2xl px-4 pb-6 flex flex-col items-center gap-4">
+      {/* Control Buttons & Real-time HUD */}
+      <div className="relative z-10 w-full max-w-2xl px-4 pb-4 sm:pb-6 flex flex-col items-center gap-3">
         {/* 4 HUD Frequency Boxes */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 w-full">
-          <div className="p-2 sm:p-2.5 rounded-lg bg-slate-950/80 border border-slate-800 text-center">
-            <div className="text-[10px] font-orbitron font-bold text-slate-400 uppercase tracking-widest">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full">
+          <div className="p-1.5 sm:p-2 rounded-lg bg-slate-950/80 border border-slate-800 text-center">
+            <div className="text-[9px] font-orbitron font-bold text-slate-400 uppercase tracking-widest">
               LEFT EAR
             </div>
             <div className="text-xs sm:text-sm font-mono font-bold text-cyan-300 mt-0.5">
@@ -303,8 +308,8 @@ export const ActiveSessionView: React.FC<ActiveSessionViewProps> = ({
             </div>
           </div>
 
-          <div className="p-2 sm:p-2.5 rounded-lg bg-slate-950/80 border border-slate-800 text-center">
-            <div className="text-[10px] font-orbitron font-bold text-slate-400 uppercase tracking-widest">
+          <div className="p-1.5 sm:p-2 rounded-lg bg-slate-950/80 border border-slate-800 text-center">
+            <div className="text-[9px] font-orbitron font-bold text-slate-400 uppercase tracking-widest">
               RIGHT EAR
             </div>
             <div className="text-xs sm:text-sm font-mono font-bold text-cyan-300 mt-0.5">
@@ -312,8 +317,8 @@ export const ActiveSessionView: React.FC<ActiveSessionViewProps> = ({
             </div>
           </div>
 
-          <div className="p-2 sm:p-2.5 rounded-lg bg-slate-950/80 border border-slate-800 text-center">
-            <div className="text-[10px] font-orbitron font-bold text-slate-400 uppercase tracking-widest">
+          <div className="p-1.5 sm:p-2 rounded-lg bg-slate-950/80 border border-slate-800 text-center">
+            <div className="text-[9px] font-orbitron font-bold text-slate-400 uppercase tracking-widest">
               BEAT
             </div>
             <div className="text-xs sm:text-sm font-mono font-bold text-emerald-400 mt-0.5 truncate">
@@ -321,8 +326,8 @@ export const ActiveSessionView: React.FC<ActiveSessionViewProps> = ({
             </div>
           </div>
 
-          <div className="p-2 sm:p-2.5 rounded-lg bg-slate-950/80 border border-slate-800 text-center">
-            <div className="text-[10px] font-orbitron font-bold text-slate-400 uppercase tracking-widest">
+          <div className="p-1.5 sm:p-2 rounded-lg bg-slate-950/80 border border-slate-800 text-center">
+            <div className="text-[9px] font-orbitron font-bold text-slate-400 uppercase tracking-widest">
               φ OPENING
             </div>
             <div className="text-xs sm:text-sm font-mono font-bold text-amber-400 mt-0.5">
@@ -331,38 +336,54 @@ export const ActiveSessionView: React.FC<ActiveSessionViewProps> = ({
           </div>
         </div>
 
-        {/* 3 Action Buttons */}
-        <div className="flex items-center justify-center gap-3 w-full">
+        {/* Action Controls: Pause/Continue + Quran + Frequency + End Session */}
+        <div className="flex items-center justify-center gap-2.5 sm:gap-3 w-full flex-wrap">
+          {/* Pause / Resume Button */}
+          <button
+            onClick={onTogglePauseResume}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-orbitron font-bold tracking-wider uppercase transition-all cursor-pointer shadow-md ${
+              isPaused
+                ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 hover:scale-105 shadow-[0_0_15px_rgba(52,211,153,0.4)]'
+                : 'bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30'
+            }`}
+          >
+            {isPaused ? <Play className="w-3.5 h-3.5 fill-current ml-0.5" /> : <Pause className="w-3.5 h-3.5 fill-current" />}
+            <span>{isPaused ? 'Continue' : 'Pause'}</span>
+          </button>
+
+          {/* Toggle Quran */}
           <button
             onClick={onToggleQuran}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-orbitron font-bold tracking-wider uppercase transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-orbitron font-bold tracking-wider uppercase transition-all cursor-pointer ${
               isQuranPlaying
                 ? 'bg-slate-900/90 text-cyan-300 border border-cyan-500/50 hover:bg-slate-800'
                 : 'bg-slate-900/60 text-slate-500 border border-slate-800 hover:text-slate-300'
             }`}
           >
-            {isQuranPlaying ? <Pause className="w-3.5 h-3.5 fill-current" /> : <Play className="w-3.5 h-3.5 fill-current" />}
+            <BookOpen className="w-3.5 h-3.5" />
             <span>Quran</span>
           </button>
 
+          {/* Toggle Frequency */}
           <button
             onClick={onToggleFrequency}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-orbitron font-bold tracking-wider uppercase transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-orbitron font-bold tracking-wider uppercase transition-all cursor-pointer ${
               isFrequencyPlaying
                 ? 'bg-slate-900/90 text-emerald-300 border border-emerald-500/50 hover:bg-slate-800'
                 : 'bg-slate-900/60 text-slate-500 border border-slate-800 hover:text-slate-300'
             }`}
           >
-            {isFrequencyPlaying ? <Pause className="w-3.5 h-3.5 fill-current" /> : <Play className="w-3.5 h-3.5 fill-current" />}
-            <span>Frequency</span>
+            <span className="font-mono text-xs">Hz</span>
+            <span>Freq</span>
           </button>
 
+          {/* End Session Button */}
           <button
             onClick={onEndSession}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-orbitron font-bold tracking-wider uppercase bg-rose-950/50 hover:bg-rose-900/60 text-rose-300 border border-rose-500/40 hover:border-rose-400 transition-all cursor-pointer shadow-sm"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-orbitron font-bold tracking-wider uppercase bg-rose-950/50 hover:bg-rose-900/60 text-rose-300 border border-rose-500/40 hover:border-rose-400 transition-all cursor-pointer shadow-sm"
           >
             <Square className="w-3.5 h-3.5 fill-current" />
-            <span>End session</span>
+            <span>End Session</span>
           </button>
         </div>
       </div>

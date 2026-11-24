@@ -275,6 +275,56 @@ export class AudioEngine {
   }
 
   /**
+   * Pause session in place without resetting playback position
+   */
+  public pauseSession() {
+    if (!this.isPlaying) return;
+    this.isPlaying = false;
+    this.callbacks.onPlayStateChange?.(false);
+
+    if (this.openingTimer) {
+      clearTimeout(this.openingTimer);
+      this.openingTimer = null;
+    }
+
+    // Stop tone generators so no frequency buzzes while paused
+    this.stopBinauralBeat();
+    this.stopOpeningChord();
+
+    // Pause audio elements preserving currentTime
+    if (this.bismillahAudioElement && !this.bismillahAudioElement.paused) {
+      this.bismillahAudioElement.pause();
+    }
+    if (this.quranAudioElement && !this.quranAudioElement.paused) {
+      this.quranAudioElement.pause();
+    }
+  }
+
+  /**
+   * Resume session seamlessly from the exact second it was paused
+   */
+  public resumeSession() {
+    if (this.isPlaying) return;
+    this.initContext();
+    if (this.audioCtx && this.audioCtx.state === 'suspended') {
+      this.audioCtx.resume();
+    }
+
+    this.isPlaying = true;
+    this.callbacks.onPlayStateChange?.(true);
+
+    // Resume binaural beat
+    this.startBinauralBeat(this.currentCarrierHz, this.currentBeatHz);
+
+    // Resume audio playback from current position
+    if (this.isOpening && this.bismillahAudioElement) {
+      this.bismillahAudioElement.play().catch(() => {});
+    } else if (this.quranAudioElement) {
+      this.quranAudioElement.play().catch(() => {});
+    }
+  }
+
+  /**
    * Smooth 3-Second Audio Auto-Fade Out when session timer expires or Sunnah repetitions complete
    */
   public fadeStopSession(fadeDuration = 3, onComplete?: () => void) {
