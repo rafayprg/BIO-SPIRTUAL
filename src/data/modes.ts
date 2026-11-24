@@ -92,7 +92,7 @@ export const MODES: Mode[] = [
       "Say A'udhu billahi minash-shaytanir-rajeem (Sahih al-Bukhari 6115)",
       "Stay Silent immediately (Musnad Ahmad 2136)",
       "Change Posture — Sit if standing, lie down if sitting (Sunan Abi Dawud 4782)",
-      "Make Wudu with cold water (Sunan Abi Dawud 4784)"
+      "Cool down with cold water (Practical Tip / Prophetic Wisdom)"
     ],
     customAudioUrls: [
       'https://cdn.islamic.network/quran/audio/128/ar.alafasy/427.mp3', // Ayah 3:134
@@ -100,7 +100,7 @@ export const MODES: Mode[] = [
     ],
     verification: {
       islamicTag: 'Authentic Sunnah',
-      islamicCitation: "Sunan Abi Dawud 4782 & Surah Ali 'Imran 3:134 (Restraining anger and changing physical posture)",
+      islamicCitation: "Surah Ali 'Imran 3:134, Sahih al-Bukhari 6115 (A'udhu billah), Musnad Ahmad 2136 (Silence), Sunan Abi Dawud 4782 (Change posture)",
       islamicUrl: 'https://khidma.live/blog/anger-in-islam-how-to-control-your-temper-and-deal-with-an-angry-spouse',
       scienceTag: 'Peer-Reviewed',
       scienceSummary: 'Stanford Cyclic Sighing RCT (Balban et al., 2023, Cell Reports Medicine): 5 minutes of cyclic sighing daily significantly downregulates sympathetic hyperarousal, lowers respiratory rate, and enhances immediate emotional regulation.',
