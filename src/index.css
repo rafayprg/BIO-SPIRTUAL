@@ -9,71 +9,76 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: #09131f;
+  background-color: #050b12;
   background-image: 
-    radial-gradient(ellipse at 50% 0%, #15273f 0%, #0d1b2a 50%, #09131f 100%);
+    radial-gradient(circle at 88% 88%, rgba(217, 119, 6, 0.22) 0%, rgba(180, 83, 9, 0.06) 38%, transparent 65%),
+    radial-gradient(circle at 15% 20%, #0b2928 0%, #07131c 50%, #050b12 100%);
   background-attachment: fixed;
-  color: #f8fafc;
+  color: #ffffff;
   font-family: 'Inter', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   overflow-x: hidden;
+  min-height: 100vh;
 }
 
-/* Custom scrollbars */
+/* Custom sleek scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #09131f;
+  background: rgba(5, 11, 18, 0.8);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(34, 211, 238, 0.25);
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(34, 211, 238, 0.5);
+  background: rgba(52, 211, 153, 0.45);
 }
 
-/* Cyber geometric grid */
-.cyber-grid {
-  background-size: 32px 32px;
-  background-image: 
-    linear-gradient(to right, rgba(34, 211, 238, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(34, 211, 238, 0.04) 1px, transparent 1px);
+/* Apple Liquid Glass Surface Utilities */
+.liquid-glass {
+  background: rgba(12, 24, 34, 0.62);
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 18px 40px -12px rgba(0, 0, 0, 0.55);
 }
 
-/* Subtle glow animations */
-@keyframes pulse-slow {
-  0%, 100% {
-    opacity: 0.85;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.02);
-  }
+.liquid-glass-elevated {
+  background: rgba(15, 30, 44, 0.75);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 24px 50px -12px rgba(0, 0, 0, 0.65);
 }
 
-.animate-pulse-slow {
-  animation: pulse-slow 4s ease-in-out infinite;
+.liquid-glass-card {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 10px 25px -5px rgba(0, 0, 0, 0.35);
 }
 
-@keyframes wave-bounce {
-  0%, 100% {
-    height: 6px;
-  }
-  50% {
-    height: 28px;
-  }
+.liquid-glass-pill {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
-.wave-bar {
-  animation: wave-bounce 1.2s ease-in-out infinite;
+/* Dual-Layer Sidebar Active Concave Merging Pill */
+.active-sidebar-pill {
+  background: #ffffff;
+  color: #09131f;
+  box-shadow: 0 4px 20px -2px rgba(255, 255, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 /* Arabic typography styling */
 .font-arabic {
   font-family: 'Amiri', 'Noto Naskh Arabic', serif;
-  line-height: 2.1;
+  line-height: 1.8;
   direction: rtl;
 }

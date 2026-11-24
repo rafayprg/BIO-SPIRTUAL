@@ -1,20 +1,25 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { CyberHeader } from './components/CyberHeader';
-import { FeaturedCard } from './components/FeaturedCard';
-import { ModeCard } from './components/ModeCard';
-import { ModeDetailsPanel } from './components/ModeDetailsPanel';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { GlassySidebar } from './components/GlassySidebar';
+import { LiquidNavbar } from './components/LiquidNavbar';
+import { StudioCard } from './components/StudioCard';
+import { BentoModeGrid } from './components/BentoModeGrid';
+import { LiquidAudioDock } from './components/LiquidAudioDock';
 import { ActiveSessionView } from './components/ActiveSessionView';
 import { QuranReaderModal } from './components/QuranReaderModal';
-import { AudioControls } from './components/AudioControls';
 import { GuidedBreathingModal } from './components/GuidedBreathingModal';
 import { VerifiedSourcesDrawer } from './components/VerifiedSourcesDrawer';
 import { MODES } from './data/modes';
-import type { Mode } from './data/modes';
+import type { Mode, ModeCategory } from './data/modes';
 import { AudioEngine } from './audio/audioEngine';
-import { Cpu } from 'lucide-react';
 
 export const App: React.FC = () => {
-  // Default selected is Mind Reset
+  // Navigation & Filtering State
+  const [selectedCategory, setSelectedCategory] = useState<'all' | ModeCategory>('all');
+  const [selectedBandFilter, setSelectedBandFilter] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
+
+  // Audio & Active Session State
   const [selectedMode, setSelectedMode] = useState<Mode>(
     MODES.find((m) => m.id === 'mind-reset') || MODES[1]
   );
@@ -27,10 +32,11 @@ export const App: React.FC = () => {
   const [isFrequencyPlaying, setIsFrequencyPlaying] = useState<boolean>(true);
   const [binauralVolume, setBinauralVolume] = useState<number>(0.5);
   const [quranVolume, setQuranVolume] = useState<number>(0.85);
+
+  // Modals & Drawers
   const [isFullScreenSession, setIsFullScreenSession] = useState<boolean>(false);
   const [isReaderOpen, setIsReaderOpen] = useState<boolean>(false);
-  const [isBreathingOpen, setIsBreathingOpen] = useState<boolean>(false);
-  const [breathingPattern, setBreathingPattern] = useState<'cyclic-sighing' | 'box-breathing'>('cyclic-sighing');
+  const [isBreathingModalOpen, setIsBreathingModalOpen] = useState<boolean>(false);
   const [isVerifiedSourcesOpen, setIsVerifiedSourcesOpen] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -59,28 +65,19 @@ export const App: React.FC = () => {
     };
   }, []);
 
-  // Update volumes in engine
+  // Sync volumes to Web Audio engine
   useEffect(() => {
     audioEngineRef.current?.setVolumes(binauralVolume, quranVolume);
   }, [binauralVolume, quranVolume]);
 
-  /**
-   * Whenever ANY card is clicked / selected:
-   * Immediately start the exact recitation + binaural reset frequency!
-   */
   const handleSelectMode = (mode: Mode) => {
     setSelectedMode(mode);
     setActiveSurahIndex(0);
     setCurrentAyahIndex(0);
 
-    if (mode.recommendedBreathing) {
-      setBreathingPattern(mode.recommendedBreathing);
-    }
-
     if (audioEngineRef.current) {
       setIsQuranPlaying(true);
       setIsFrequencyPlaying(true);
-      // Immediately start the dual-layer audio in the exact voice
       audioEngineRef.current.startSession(
         mode.carrierHz,
         mode.beatHz,
@@ -91,9 +88,6 @@ export const App: React.FC = () => {
     }
   };
 
-  /**
-   * Launch Full-Screen Sacred Mandala & Breathing Pacer session view
-   */
   const handleLaunchFullScreen = () => {
     if (!isPlaying && audioEngineRef.current) {
       audioEngineRef.current.startSession(
@@ -113,6 +107,14 @@ export const App: React.FC = () => {
     setIsFullScreenSession(false);
   };
 
+  const handleTogglePlay = () => {
+    if (isPlaying) {
+      handleEndSession();
+    } else {
+      handleSelectMode(selectedMode);
+    }
+  };
+
   const handleToggleQuran = () => {
     if (!audioEngineRef.current) return;
     const active = audioEngineRef.current.toggleQuran();
@@ -125,112 +127,177 @@ export const App: React.FC = () => {
     setIsFrequencyPlaying(active);
   };
 
-  const handleTogglePlay = () => {
-    if (isPlaying) {
-      handleEndSession();
-    } else {
-      handleSelectMode(selectedMode);
-    }
-  };
+  // Filter modes dynamically
+  const filteredModes = useMemo(() => {
+    return MODES.filter((mode) => {
+      // Search query filter
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const matchName = mode.name.toLowerCase().includes(q);
+        const matchSurah = mode.surahDisplay.toLowerCase().includes(q);
+        const matchArabic = mode.arabicName?.toLowerCase().includes(q);
+        const matchBand = mode.band.toLowerCase().includes(q);
+        const matchFor = mode.forText.toLowerCase().includes(q);
+        if (!matchName && !matchSurah && !matchArabic && !matchBand && !matchFor) {
+          return false;
+        }
+      }
 
-  const handleOpenGuidedBreathing = (pattern?: 'cyclic-sighing' | 'box-breathing') => {
-    if (pattern) {
-      setBreathingPattern(pattern);
-    } else if (selectedMode.recommendedBreathing) {
-      setBreathingPattern(selectedMode.recommendedBreathing);
-    }
-    setIsBreathingOpen(true);
-  };
+      // Category filter
+      if (selectedCategory !== 'all' && mode.category !== selectedCategory) {
+        return false;
+      }
 
-  const featuredMode = MODES.find((m) => m.isFeatured) || MODES[0];
-  const gridModes = MODES.filter((m) => !m.isFeatured);
+      // Band filter
+      if (selectedBandFilter) {
+        if (selectedBandFilter === 'Alpha' && mode.band !== 'Alpha') return false;
+        if (selectedBandFilter === 'Theta' && mode.band !== 'Theta') return false;
+        if (selectedBandFilter === 'Beta-SMR' && mode.band !== 'Beta' && mode.band !== 'SMR') return false;
+        if (
+          selectedBandFilter === 'Delta-Gamma' &&
+          mode.band !== 'Delta' &&
+          mode.band !== 'Gamma' &&
+          mode.band !== 'Schumann'
+        ) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [searchQuery, selectedCategory, selectedBandFilter]);
+
+  const categoryCounts = useMemo(() => {
+    return {
+      all: MODES.length,
+      'calm-reset': MODES.filter((m) => m.category === 'calm-reset').length,
+      protection: MODES.filter((m) => m.category === 'protection').length,
+      'focus-rizq': MODES.filter((m) => m.category === 'focus-rizq').length,
+      'sleep-healing': MODES.filter((m) => m.category === 'sleep-healing').length,
+    };
+  }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#09131f] text-slate-100 cyber-grid relative selection:bg-cyan-500/30 selection:text-cyan-200">
+    <div className="min-h-screen w-full flex p-3 sm:p-5 gap-5 relative text-white selection:bg-cyan-500/30 selection:text-cyan-200">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed top-5 right-5 z-50 max-w-md bg-rose-950/90 border border-rose-500/50 text-rose-200 px-4 py-3 rounded-xl shadow-xl text-xs backdrop-blur-md animate-in fade-in">
+        <div className="fixed top-5 right-5 z-50 max-w-md bg-rose-950/90 border border-rose-500/50 text-rose-200 px-4 py-3 rounded-2xl shadow-xl text-xs backdrop-blur-md animate-fadeIn">
           {toastMessage}
         </div>
       )}
 
-      {/* Main Console Container */}
-      <main className="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-6 pt-4 pb-28 flex flex-col">
-        {/* Header Block matching Reel */}
-        <CyberHeader />
-
-        {/* Console Section Header */}
-        <div className="mt-4 mb-3 flex flex-col sm:flex-row sm:items-end justify-between border-b border-slate-800/80 pb-2.5 gap-2">
-          <div>
-            <div className="text-[11px] font-bold uppercase tracking-wider text-cyan-400 font-orbitron flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
-              <Cpu className="w-3.5 h-3.5 text-cyan-400" />
-              <span>NEURO RESET CONSOLE · V2 UPGRADE</span>
-            </div>
-            <h2 className="text-xl sm:text-2xl font-extrabold tracking-wide text-slate-100 uppercase font-orbitron mt-0.5">
-              WHAT DO YOU NEED?
-            </h2>
-          </div>
-
-          <div className="text-xs text-slate-400 font-medium">
-            <span>15 Validated Neuro Reset Modes · Select any card to stream</span>
-          </div>
-        </div>
-
-        {/* Top Orange Horizontal Divider */}
-        <div className="mb-4 w-full h-[1.5px] bg-gradient-to-r from-amber-600/80 via-amber-400 to-amber-600/80 shadow-[0_0_10px_rgba(245,158,11,0.5)]" />
-
-        {/* 3. Top Full-Width Featured Card (Crypto Trading: Calm & Cool) */}
-        <div className="mb-4">
-          <FeaturedCard
-            mode={featuredMode}
-            isSelected={selectedMode.id === featuredMode.id}
-            onSelect={handleSelectMode}
-            isPlaying={isPlaying && selectedMode.id === featuredMode.id}
-          />
-        </div>
-
-        {/* 4. Responsive Grid of 14 Mode Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {gridModes.map((mode) => (
-            <ModeCard
-              key={mode.id}
-              mode={mode}
-              isSelected={selectedMode.id === mode.id}
-              onSelect={handleSelectMode}
-              isPlaying={isPlaying && selectedMode.id === mode.id}
-            />
-          ))}
-        </div>
-
-        {/* 5. Bottom Selected-Mode Details Panel with START: FREQUENCY -> QURAN */}
-        <ModeDetailsPanel
-          mode={selectedMode}
-          onStartSession={handleLaunchFullScreen}
-          onOpenReader={() => setIsReaderOpen(true)}
-          onOpenVerifiedSources={() => setIsVerifiedSourcesOpen(true)}
-          onOpenGuidedBreathing={handleOpenGuidedBreathing}
-        />
-      </main>
-
-      {/* Persistent Bottom Audio Control Bar */}
-      <AudioControls
-        currentMode={selectedMode}
+      {/* 1. Glassy Sidebar V10 (Dual-Layer Floating Sidebar) */}
+      <GlassySidebar
+        isOpen={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
+        selectedCategory={selectedCategory}
+        onSelectCategory={setSelectedCategory}
+        selectedBandFilter={selectedBandFilter}
+        onSelectBandFilter={setSelectedBandFilter}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
         isPlaying={isPlaying}
-        isOpening={isOpening}
-        isBuffering={isBuffering}
-        activeSurahNumber={selectedMode.surahNumbers[activeSurahIndex] || selectedMode.surahNumbers[0]}
-        binauralVolume={binauralVolume}
-        quranVolume={quranVolume}
         onTogglePlay={handleTogglePlay}
-        onBinauralVolumeChange={setBinauralVolume}
-        onQuranVolumeChange={setQuranVolume}
-        analyser={audioEngineRef.current?.getAnalyser() || null}
+        onOpenBreathing={() => setIsBreathingModalOpen(true)}
+        onOpenSources={() => setIsVerifiedSourcesOpen(true)}
         onOpenReader={() => setIsReaderOpen(true)}
-        onOpenGuidedBreathing={() => handleOpenGuidedBreathing()}
+        categoryCounts={categoryCounts}
       />
 
-      {/* FULL SCREEN IMMERSIVE ACTIVE SESSION VIEW */}
+      {/* 2. Main Workspace (Admin Dashboard V7 Layout) */}
+      <div className="flex-1 flex flex-col gap-5 min-w-0">
+        {/* Floating Liquid Glass Pill NavBar */}
+        <LiquidNavbar
+          onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          onOpenBreathing={() => setIsBreathingModalOpen(true)}
+          onOpenSources={() => setIsVerifiedSourcesOpen(true)}
+          onOpenReader={() => setIsReaderOpen(true)}
+          isBreathingActive={isBreathingModalOpen}
+        />
+
+        {/* Main Dashboard Workspace Container */}
+        <div className="flex-1 w-full liquid-glass rounded-3xl p-4 sm:p-6 shadow-2xl flex flex-col gap-6">
+          {/* Header Row inside Dashboard */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-white/10 gap-2">
+            <div>
+              <div className="text-[10px] font-mono font-bold tracking-widest text-cyan-400 uppercase">
+                BIO SPIRITUAL HACKING · SYSTEM ARCHITECTURE
+              </div>
+              <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-white font-orbitron mt-0.5">
+                NEURO RESET CONSOLE
+              </h2>
+            </div>
+            <div className="text-xs text-white/50 font-medium">
+              Showing {filteredModes.length} of {MODES.length} Validated Modes
+            </div>
+          </div>
+
+          {/* 2-Column Asymmetric Studio + Bento Grid */}
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+            {/* Left Studio Column (col-span-5) */}
+            <div className="xl:col-span-5 w-full">
+              <StudioCard
+                mode={selectedMode}
+                isPlaying={isPlaying}
+                isOpening={isOpening}
+                isBuffering={isBuffering}
+                onTogglePlay={handleTogglePlay}
+                onLaunchFullScreen={handleLaunchFullScreen}
+                onOpenSources={() => setIsVerifiedSourcesOpen(true)}
+                onOpenReader={() => setIsReaderOpen(true)}
+                onChimeCue={() => audioEngineRef.current?.playChimeCue(432)}
+                analyser={audioEngineRef.current?.getAnalyser() || null}
+              />
+            </div>
+
+            {/* Right Bento Column (col-span-7) */}
+            <div className="xl:col-span-7 w-full flex flex-col gap-4">
+              <div className="flex items-center justify-between px-1">
+                <span className="text-xs font-bold text-white/70 uppercase tracking-wider font-orbitron">
+                  {selectedCategory === 'all'
+                    ? 'Explore All Modes'
+                    : selectedCategory === 'calm-reset'
+                    ? 'Calm & Reset Modes'
+                    : selectedCategory === 'protection'
+                    ? 'Spiritual Protection Modes'
+                    : selectedCategory === 'focus-rizq'
+                    ? 'Focus & Executive Clarity Modes'
+                    : 'Restorative Sleep & Healing Modes'}
+                </span>
+                <span className="text-xs text-white/40">Select card to stream</span>
+              </div>
+
+              <BentoModeGrid
+                modes={filteredModes}
+                selectedModeId={selectedMode.id}
+                onSelectMode={handleSelectMode}
+                isPlaying={isPlaying}
+              />
+            </div>
+          </div>
+
+          {/* Floating Liquid Audio Dock (Bottom of Dashboard Container) */}
+          <div className="mt-2 pt-2">
+            <LiquidAudioDock
+              currentMode={selectedMode}
+              isPlaying={isPlaying}
+              isOpening={isOpening}
+              isBuffering={isBuffering}
+              activeSurahNumber={selectedMode.surahNumbers[activeSurahIndex] || selectedMode.surahNumbers[0]}
+              binauralVolume={binauralVolume}
+              quranVolume={quranVolume}
+              onTogglePlay={handleTogglePlay}
+              onBinauralVolumeChange={setBinauralVolume}
+              onQuranVolumeChange={setQuranVolume}
+              onOpenReader={() => setIsReaderOpen(true)}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Full-Screen Sacred Mandala View (when expanded) */}
       {isFullScreenSession && (
         <ActiveSessionView
           mode={selectedMode}
@@ -252,15 +319,15 @@ export const App: React.FC = () => {
         mode={selectedMode}
       />
 
-      {/* Feature 5A: Toggleable Guided Breathing Ring Modal */}
+      {/* Guided Breathing Modal */}
       <GuidedBreathingModal
-        isOpen={isBreathingOpen}
-        onClose={() => setIsBreathingOpen(false)}
-        initialMode={breathingPattern}
+        isOpen={isBreathingModalOpen}
+        onClose={() => setIsBreathingModalOpen(false)}
+        initialMode={selectedMode.recommendedBreathing || 'cyclic-sighing'}
         onPhaseChangeChime={() => audioEngineRef.current?.playChimeCue(432)}
       />
 
-      {/* Feature 5B: Verified Research & Islamic Basis Drawer */}
+      {/* Verified Sources Drawer */}
       <VerifiedSourcesDrawer
         isOpen={isVerifiedSourcesOpen}
         onClose={() => setIsVerifiedSourcesOpen(false)}
