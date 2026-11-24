@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, ExternalLink, ShieldCheck, Microscope, BookOpen, AlertTriangle } from 'lucide-react';
+import { X, ExternalLink, ShieldCheck, Microscope, BookOpen, AlertTriangle, Clock } from 'lucide-react';
 import type { Mode } from '../data/modes';
 
 interface VerifiedSourcesDrawerProps {
@@ -122,7 +122,37 @@ export const VerifiedSourcesDrawer: React.FC<VerifiedSourcesDrawerProps> = ({
             </div>
           </div>
 
-          {/* 3. Transparency & Scientific Integrity Disclaimer */}
+          {/* 3. Session Duration & Repetition Count Basis */}
+          <div className="p-4 rounded-xl bg-slate-900/80 border border-amber-500/30">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-amber-400" />
+                <h4 className="font-bold text-amber-300 font-orbitron text-xs tracking-wider uppercase">
+                  Session Duration &amp; Count Basis
+                </h4>
+              </div>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono tracking-wide uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                {mode.sessionDefaults.durationBadge}
+              </span>
+            </div>
+
+            <p className="text-slate-200 leading-relaxed font-normal mb-2.5">
+              {mode.sessionDefaults.timingGuidance}
+            </p>
+
+            <div className="text-[11.5px] text-slate-300/90 space-y-1.5 pt-2 border-t border-slate-800">
+              <div className="flex items-start gap-2">
+                <span className="text-cyan-400 font-bold">•</span>
+                <span><strong>Binaural Exposure Window (15–30 min):</strong> Clinical reviews show 15–30 minutes of continuous binaural auditory stimulation is the optimal window for steady neuro-entrainment without fatigue (<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12597119/" target="_blank" rel="noopener noreferrer" className="text-cyan-400 underline">PMC12597119</a>).</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-emerald-400 font-bold">•</span>
+                <span><strong>Authentic Sunnah Counts:</strong> Repetition numbers (3× Al-Mu'awwidhatayn — <a href="https://sunnah.com/abudawud:5082" target="_blank" rel="noopener noreferrer" className="text-emerald-400 underline">Abu Dawud 5082</a>, 1× Ayat al-Kursi — <a href="https://sunnah.com/bukhari:5010" target="_blank" rel="noopener noreferrer" className="text-emerald-400 underline">Bukhari 5010</a>, 1× Al-Mulk — <a href="https://sunnah.com/tirmidhi:2890" target="_blank" rel="noopener noreferrer" className="text-emerald-400 underline">Tirmidhi 2890</a>) are <em>strictly preserved only where authentic Hadith establishes them</em>. All other modes are marked <strong>Flexible (No Fixed Count)</strong> to avoid invented counts.</span>
+              </div>
+            </div>
+          </div>
+
+          {/* 4. Transparency & Scientific Integrity Disclaimer */}
           <div className="p-3.5 rounded-xl bg-slate-900/50 border border-amber-500/30 flex items-start gap-2.5">
             <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
             <p className="text-[11px] sm:text-xs text-amber-200/90 leading-relaxed">

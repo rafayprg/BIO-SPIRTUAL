@@ -9,6 +9,15 @@ export interface VerificationSource {
   scienceUrl: string;
 }
 
+export interface SessionDefaults {
+  defaultMinutes: number; // Smart default timer duration in minutes (user can override)
+  sunnahRepeatCount?: number; // ONLY set when an authentic Hadith specifies an exact count (e.g., 3 or 1)
+  sunnahLabel: string; // e.g., "3× Sunnah" | "1× Nightly Sunnah" | "Flexible (No Fixed Count)"
+  durationBadge: string; // Short badge shown on card & studio, e.g., "3× Sunnah · 15m" or "20m · Loop"
+  timingGuidance: string; // Short explanation shown in Details & Verified Sources
+  timingSourceUrl?: string;
+}
+
 export interface Mode {
   id: string;
   name: string;
@@ -36,6 +45,7 @@ export interface Mode {
   sunnahChecklist?: string[];
   customAudioUrls?: string[];
   verification: VerificationSource;
+  sessionDefaults: SessionDefaults;
 }
 
 export const MODES: Mode[] = [
@@ -68,7 +78,15 @@ export const MODES: Mode[] = [
       scienceTag: 'Peer-Reviewed',
       scienceSummary: 'Alpha Entrainment & Decision Under Risk (IEEE Xplore / PMC10198548): 10 Hz alpha wave stimulation stabilizes prefrontal cortex activity during high-risk monetary choices, curbing panic selling and loss-aversion bias.',
       scienceUrl: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC10198548/'
-    }
+    },
+    sessionDefaults: {
+      "defaultMinutes": 15,
+      "sunnahRepeatCount": 3,
+      "sunnahLabel": "3× Sunnah",
+      "durationBadge": "3× Sunnah · 15m",
+      "timingGuidance": "3× Al-Mu'awwidhatayn for calm refuge + 15m Alpha (10 Hz) pre-trade focus.",
+      "timingSourceUrl": "https://sunnah.com/abudawud:5082"
+}
   },
 
   // 2. NEW V2: Anger & Impulse Reset
@@ -110,7 +128,15 @@ export const MODES: Mode[] = [
       scienceTag: 'Peer-Reviewed',
       scienceSummary: 'Stanford Cyclic Sighing RCT (Balban et al., 2023, Cell Reports Medicine): 5 minutes of cyclic sighing daily significantly downregulates sympathetic hyperarousal, lowers respiratory rate, and enhances immediate emotional regulation.',
       scienceUrl: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC9873947/'
-    }
+    },
+    sessionDefaults: {
+      "defaultMinutes": 5,
+      "sunnahRepeatCount": 1,
+      "sunnahLabel": "1× A'udhu",
+      "durationBadge": "5m Cooldown",
+      "timingGuidance": "Stanford Cyclic Sighing protocol (5 min daily / 1–5m acute cooldown, PMC9873947) + Sunnah steps.",
+      "timingSourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9873947/"
+}
   },
 
   // 3. NEW V2: Waswasah & Overthinking Shield
@@ -146,7 +172,15 @@ export const MODES: Mode[] = [
       scienceTag: 'Peer-Reviewed',
       scienceSummary: 'Binaural Beats Systematic Review & Meta-Analysis (PMC10198548): Low-alpha auditory beat stimulation modulates cortical oscillatory networks, suppressing rumination loops and quieting intrusive thought patterns.',
       scienceUrl: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC10198548/'
-    }
+    },
+    sessionDefaults: {
+      "defaultMinutes": 15,
+      "sunnahRepeatCount": 3,
+      "sunnahLabel": "1× Kursi + 3× Nas",
+      "durationBadge": "1× + 3× Sunnah · 15m",
+      "timingGuidance": "Sahih al-Bukhari 5010 (1× Ayat al-Kursi) + 3× Surah An-Nas + 15m Low Alpha (9 Hz).",
+      "timingSourceUrl": "https://sunnah.com/bukhari:5010"
+}
   },
 
   // 4. NEW V2: Grief, Hardship & Sabr
@@ -178,7 +212,14 @@ export const MODES: Mode[] = [
       scienceTag: 'Peer-Reviewed',
       scienceSummary: 'Theta Binaural Beats & Anxiety Meta-Analysis (PMC12145584): Theta-band auditory entrainment (4–7 Hz) promotes deep emotional processing, downregulation of the limbic alarm system, and significant anxiety reduction.',
       scienceUrl: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC12145584/'
-    }
+    },
+    sessionDefaults: {
+      "defaultMinutes": 25,
+      "sunnahLabel": "Flexible (No Fixed Count)",
+      "durationBadge": "25m · Reflect",
+      "timingGuidance": "No fixed Sunnah count — full reflective listening + Theta (5.5 Hz).",
+      "timingSourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12597119/"
+}
   },
 
   // 5. NEW V2: Rizq, Tawakkul & Work Clarity
@@ -210,7 +251,14 @@ export const MODES: Mode[] = [
       scienceTag: 'Peer-Reviewed',
       scienceSummary: 'Sensorimotor Rhythm (SMR 12–15 Hz) Neurofeedback & Focus (PMC11426047): SMR brainwave entrainment enhances sustained attention, reduces impulsive motor activity, and fosters calm executive functioning.',
       scienceUrl: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC11426047/'
-    }
+    },
+    sessionDefaults: {
+      "defaultMinutes": 20,
+      "sunnahLabel": "Flexible (No Fixed Count)",
+      "durationBadge": "20m · Focus",
+      "timingGuidance": "No fixed Sunnah count — 20m SMR (14 Hz) calm executive clarity.",
+      "timingSourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12597119/"
+}
   },
 
   // 6. Mind Reset
@@ -241,7 +289,14 @@ export const MODES: Mode[] = [
       scienceTag: 'Peer-Reviewed',
       scienceSummary: 'Gratitude Neurobiology & Dopamine Reset (Cerebrum / NIH PMC9873947): Deliberate gratitude reflection activates medial prefrontal circuits, rebalancing dopamine pathways and quieting baseline neurological noise.',
       scienceUrl: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC9873947/'
-    }
+    },
+    sessionDefaults: {
+      "defaultMinutes": 20,
+      "sunnahLabel": "Flexible (No Fixed Count)",
+      "durationBadge": "20m · Loop",
+      "timingGuidance": "No fixed Sunnah count — 20m optimal binaural exposure window (PMC12597119).",
+      "timingSourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12597119/"
+}
   },
 
   // 7. Jealousy / Hasad
@@ -273,7 +328,15 @@ export const MODES: Mode[] = [
       scienceTag: 'Supportive / Mixed',
       scienceSummary: 'Theta Acoustic Neuromodulation & Social Pain: Slow theta oscillations soothe anterior cingulate cortex hyperactivity triggered by social comparison, envy, and resentment.',
       scienceUrl: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC12145584/'
-    }
+    },
+    sessionDefaults: {
+      "defaultMinutes": 15,
+      "sunnahRepeatCount": 3,
+      "sunnahLabel": "3× Sunnah",
+      "durationBadge": "3× Sunnah · 15m",
+      "timingGuidance": "Sunnah: 3× morning, evening & before sleep (Sunan Abi Dawud 5082, Bukhari 5017) + 15m Theta calm.",
+      "timingSourceUrl": "https://sunnah.com/abudawud:5082"
+}
   },
 
   // 8. Gheebah / Backbiting
@@ -305,7 +368,14 @@ export const MODES: Mode[] = [
       scienceTag: 'Supportive / Mixed',
       scienceSummary: 'Mindful Speech & Prefrontal Inhibitory Control: 10 Hz Alpha stabilization strengthens top-down impulse control over habitual verbal and social reactivity.',
       scienceUrl: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC10198548/'
-    }
+    },
+    sessionDefaults: {
+      "defaultMinutes": 15,
+      "sunnahLabel": "Flexible (No Fixed Count)",
+      "durationBadge": "15m · Reflect",
+      "timingGuidance": "No fixed Sunnah count — 15m Alpha (10 Hz) mindful speech reset.",
+      "timingSourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12597119/"
+}
   },
 
   // 9. Motivation & Energy
@@ -336,7 +406,14 @@ export const MODES: Mode[] = [
       scienceTag: 'Supportive / Mixed',
       scienceSummary: 'Beta (18 Hz) Auditory Stimulation & Vigilance: Modulates cortical arousal, counteracting sluggish brain states and boosting dopamine turnover.',
       scienceUrl: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC11426047/'
-    }
+    },
+    sessionDefaults: {
+      "defaultMinutes": 15,
+      "sunnahLabel": "Flexible (No Fixed Count)",
+      "durationBadge": "15m · Boost",
+      "timingGuidance": "No fixed Sunnah count — 15m Beta (18 Hz) uplift session.",
+      "timingSourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12597119/"
+}
   },
 
   // 10. Focus & Study
@@ -367,7 +444,14 @@ export const MODES: Mode[] = [
       scienceTag: 'Peer-Reviewed',
       scienceSummary: '40 Hz Gamma Neural Entrainment & Working Memory (Nature / PMC10198548): 40 Hz gamma oscillations facilitate cross-frequency phase coupling and synaptic plasticity during rigorous cognitive tasks.',
       scienceUrl: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC10198548/'
-    }
+    },
+    sessionDefaults: {
+      "defaultMinutes": 25,
+      "sunnahLabel": "Flexible (No Fixed Count)",
+      "durationBadge": "25m · Deep Work",
+      "timingGuidance": "No fixed Sunnah count — 25m Gamma (40 Hz) focus block (start 5m before studying).",
+      "timingSourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12597119/"
+}
   },
 
   // 11. Anxiety & Calm
@@ -398,7 +482,14 @@ export const MODES: Mode[] = [
       scienceTag: 'Peer-Reviewed',
       scienceSummary: 'Theta Neuromodulation & Vagal Nerve Activation (PMC12145584): Rhythmic acoustic prosody combined with slow theta oscillations activates parasympathetic tone and lowers heart rate variability stress indexes.',
       scienceUrl: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC12145584/'
-    }
+    },
+    sessionDefaults: {
+      "defaultMinutes": 20,
+      "sunnahLabel": "Flexible (No Fixed Count)",
+      "durationBadge": "20m · Calm",
+      "timingGuidance": "No fixed Sunnah count — 20m Theta (6 Hz) anxiety reduction session (PMC12597119).",
+      "timingSourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12597119/"
+}
   },
 
   // 12. Deep Sleep
@@ -429,7 +520,15 @@ export const MODES: Mode[] = [
       scienceTag: 'Peer-Reviewed',
       scienceSummary: 'Delta (0.5–3 Hz) Slow-Wave Sleep Facilitation: Auditory delta stimulation promotes transition into deep non-REM stage 3 sleep, facilitating glymphatic brain clearance and restorative neurogenesis.',
       scienceUrl: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC10198548/'
-    }
+    },
+    sessionDefaults: {
+      "defaultMinutes": 30,
+      "sunnahRepeatCount": 1,
+      "sunnahLabel": "1× Nightly Sunnah",
+      "durationBadge": "1× Nightly · 30m",
+      "timingGuidance": "Sunnah: 1× every night before sleep (Tirmidhi 2890) + 30m Delta (2 Hz) sleep fade-out.",
+      "timingSourceUrl": "https://sunnah.com/tirmidhi:2890"
+}
   },
 
   // 13. Dhikr & Meditation
@@ -460,7 +559,14 @@ export const MODES: Mode[] = [
       scienceTag: 'Supportive / Mixed',
       scienceSummary: 'Theta Deep Contemplative Absorption: 4 Hz theta rhythms induce deep meditative absorption and enhance introspective attentiveness without loss of vigilance.',
       scienceUrl: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC12145584/'
-    }
+    },
+    sessionDefaults: {
+      "defaultMinutes": 20,
+      "sunnahLabel": "Flexible (No Fixed Count)",
+      "durationBadge": "20m · Dhikr",
+      "timingGuidance": "No fixed Sunnah count — 20m Theta (4 Hz) quiet contemplation.",
+      "timingSourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12597119/"
+}
   },
 
   // 14. Love & Connection
@@ -491,7 +597,14 @@ export const MODES: Mode[] = [
       scienceTag: 'Supportive / Mixed',
       scienceSummary: 'Schumann Resonance & Oxytocinergic Emotional State: 7.83 Hz electromagnetic and acoustic resonance cues foster parasympathetic ease and social bonding.',
       scienceUrl: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC10198548/'
-    }
+    },
+    sessionDefaults: {
+      "defaultMinutes": 15,
+      "sunnahLabel": "Flexible (No Fixed Count)",
+      "durationBadge": "15m · Calm",
+      "timingGuidance": "No fixed Sunnah count — 15m 528 Hz + reflection on Mawaddah & Rahmah.",
+      "timingSourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12597119/"
+}
   },
 
   // 15. Healing & Shifa
@@ -522,6 +635,13 @@ export const MODES: Mode[] = [
       scienceTag: 'Peer-Reviewed',
       scienceSummary: 'Cardiovascular Autonomic Regulation & Chanting (NIH PMC9873947): Measured Quranic recitation breathing cycles enhance heart rate variability (HRV) coherence and downregulate pro-inflammatory markers.',
       scienceUrl: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC9873947/'
-    }
+    },
+    sessionDefaults: {
+      "defaultMinutes": 15,
+      "sunnahLabel": "Flexible (3× optional)",
+      "durationBadge": "Flexible · 15m",
+      "timingGuidance": "Authentic Ruqyah (Sahih al-Bukhari 5736); no strict fixed count required + 15m 432 Hz tone.",
+      "timingSourceUrl": "https://sunnah.com/bukhari:5736"
+}
   }
 ];
