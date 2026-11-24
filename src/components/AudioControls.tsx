@@ -105,7 +105,7 @@ export const AudioControls: React.FC<AudioControlsProps> = ({
               ) : isOpening ? (
                 <span className="text-amber-400 font-semibold flex items-center gap-1">
                   <Sparkles className="w-3 h-3 animate-spin" />
-                  Golden Tone &amp; Bismillah...
+                  Golden Tone (432 · 576 · 699 Hz) &amp; Bismillah...
                 </span>
               ) : isPlaying ? (
                 <span className="text-emerald-400 font-medium">
