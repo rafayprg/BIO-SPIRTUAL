@@ -6,6 +6,8 @@ import { ModeDetailsPanel } from './components/ModeDetailsPanel';
 import { ActiveSessionView } from './components/ActiveSessionView';
 import { QuranReaderModal } from './components/QuranReaderModal';
 import { AudioControls } from './components/AudioControls';
+import { GuidedBreathingModal } from './components/GuidedBreathingModal';
+import { VerifiedSourcesDrawer } from './components/VerifiedSourcesDrawer';
 import { MODES } from './data/modes';
 import type { Mode } from './data/modes';
 import { AudioEngine } from './audio/audioEngine';
@@ -18,6 +20,7 @@ export const App: React.FC = () => {
   );
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [isOpening, setIsOpening] = useState<boolean>(false);
+  const [isBuffering, setIsBuffering] = useState<boolean>(false);
   const [activeSurahIndex, setActiveSurahIndex] = useState<number>(0);
   const [currentAyahIndex, setCurrentAyahIndex] = useState<number>(0);
   const [isQuranPlaying, setIsQuranPlaying] = useState<boolean>(true);
@@ -26,6 +29,9 @@ export const App: React.FC = () => {
   const [quranVolume, setQuranVolume] = useState<number>(0.85);
   const [isFullScreenSession, setIsFullScreenSession] = useState<boolean>(false);
   const [isReaderOpen, setIsReaderOpen] = useState<boolean>(false);
+  const [isBreathingOpen, setIsBreathingOpen] = useState<boolean>(false);
+  const [breathingPattern, setBreathingPattern] = useState<'cyclic-sighing' | 'box-breathing'>('cyclic-sighing');
+  const [isVerifiedSourcesOpen, setIsVerifiedSourcesOpen] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const audioEngineRef = useRef<AudioEngine | null>(null);
@@ -34,6 +40,7 @@ export const App: React.FC = () => {
     audioEngineRef.current = new AudioEngine({
       onPlayStateChange: (playing) => setIsPlaying(playing),
       onOpeningPhaseChange: (opening) => setIsOpening(opening),
+      onBufferingChange: (buffering) => setIsBuffering(buffering),
       onSurahChange: (sIdx) => {
         setActiveSurahIndex(sIdx);
         setCurrentAyahIndex(1);
@@ -66,6 +73,10 @@ export const App: React.FC = () => {
     setActiveSurahIndex(0);
     setCurrentAyahIndex(0);
 
+    if (mode.recommendedBreathing) {
+      setBreathingPattern(mode.recommendedBreathing);
+    }
+
     if (audioEngineRef.current) {
       setIsQuranPlaying(true);
       setIsFrequencyPlaying(true);
@@ -74,7 +85,8 @@ export const App: React.FC = () => {
         mode.carrierHz,
         mode.beatHz,
         mode.surahNumbers,
-        mode.totalAyahs
+        mode.totalAyahs,
+        mode.customAudioUrls
       );
     }
   };
@@ -88,7 +100,8 @@ export const App: React.FC = () => {
         selectedMode.carrierHz,
         selectedMode.beatHz,
         selectedMode.surahNumbers,
-        selectedMode.totalAyahs
+        selectedMode.totalAyahs,
+        selectedMode.customAudioUrls
       );
     }
     setIsFullScreenSession(true);
@@ -120,6 +133,15 @@ export const App: React.FC = () => {
     }
   };
 
+  const handleOpenGuidedBreathing = (pattern?: 'cyclic-sighing' | 'box-breathing') => {
+    if (pattern) {
+      setBreathingPattern(pattern);
+    } else if (selectedMode.recommendedBreathing) {
+      setBreathingPattern(selectedMode.recommendedBreathing);
+    }
+    setIsBreathingOpen(true);
+  };
+
   const featuredMode = MODES.find((m) => m.isFeatured) || MODES[0];
   const gridModes = MODES.filter((m) => !m.isFeatured);
 
@@ -143,7 +165,7 @@ export const App: React.FC = () => {
             <div className="text-[11px] font-bold uppercase tracking-wider text-cyan-400 font-orbitron flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
               <Cpu className="w-3.5 h-3.5 text-cyan-400" />
-              <span>NEURO RESET CONSOLE</span>
+              <span>NEURO RESET CONSOLE · V2 UPGRADE</span>
             </div>
             <h2 className="text-xl sm:text-2xl font-extrabold tracking-wide text-slate-100 uppercase font-orbitron mt-0.5">
               WHAT DO YOU NEED?
@@ -151,7 +173,7 @@ export const App: React.FC = () => {
           </div>
 
           <div className="text-xs text-slate-400 font-medium">
-            <span>Select any card to instantly hear the exact recitation &amp; frequency</span>
+            <span>15 Validated Neuro Reset Modes · Select any card to stream</span>
           </div>
         </div>
 
@@ -168,7 +190,7 @@ export const App: React.FC = () => {
           />
         </div>
 
-        {/* 4. Responsive Grid of 10 Mode Cards */}
+        {/* 4. Responsive Grid of 14 Mode Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {gridModes.map((mode) => (
             <ModeCard
@@ -186,6 +208,8 @@ export const App: React.FC = () => {
           mode={selectedMode}
           onStartSession={handleLaunchFullScreen}
           onOpenReader={() => setIsReaderOpen(true)}
+          onOpenVerifiedSources={() => setIsVerifiedSourcesOpen(true)}
+          onOpenGuidedBreathing={handleOpenGuidedBreathing}
         />
       </main>
 
@@ -194,6 +218,7 @@ export const App: React.FC = () => {
         currentMode={selectedMode}
         isPlaying={isPlaying}
         isOpening={isOpening}
+        isBuffering={isBuffering}
         activeSurahNumber={selectedMode.surahNumbers[activeSurahIndex] || selectedMode.surahNumbers[0]}
         binauralVolume={binauralVolume}
         quranVolume={quranVolume}
@@ -202,6 +227,7 @@ export const App: React.FC = () => {
         onQuranVolumeChange={setQuranVolume}
         analyser={audioEngineRef.current?.getAnalyser() || null}
         onOpenReader={() => setIsReaderOpen(true)}
+        onOpenGuidedBreathing={() => handleOpenGuidedBreathing()}
       />
 
       {/* FULL SCREEN IMMERSIVE ACTIVE SESSION VIEW */}
@@ -223,6 +249,21 @@ export const App: React.FC = () => {
       <QuranReaderModal
         isOpen={isReaderOpen}
         onClose={() => setIsReaderOpen(false)}
+        mode={selectedMode}
+      />
+
+      {/* Feature 5A: Toggleable Guided Breathing Ring Modal */}
+      <GuidedBreathingModal
+        isOpen={isBreathingOpen}
+        onClose={() => setIsBreathingOpen(false)}
+        initialMode={breathingPattern}
+        onPhaseChangeChime={() => audioEngineRef.current?.playChimeCue(432)}
+      />
+
+      {/* Feature 5B: Verified Research & Islamic Basis Drawer */}
+      <VerifiedSourcesDrawer
+        isOpen={isVerifiedSourcesOpen}
+        onClose={() => setIsVerifiedSourcesOpen(false)}
         mode={selectedMode}
       />
     </div>

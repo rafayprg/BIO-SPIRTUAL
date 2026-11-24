@@ -5,6 +5,7 @@ export interface AudioEngineCallbacks {
   onOpeningPhaseChange?: (isOpening: boolean) => void;
   onSurahChange?: (surahIndex: number, surahNumber: number) => void;
   onAyahProgress?: (ayahIndex: number, totalAyahs: number) => void;
+  onBufferingChange?: (isBuffering: boolean) => void;
   onError?: (errorMessage: string) => void;
 }
 
@@ -41,6 +42,7 @@ export class AudioEngine {
   public currentBeatHz = 10;
   private surahQueue: number[] = [55];
   private totalAyahsQueue: number[] = [78];
+  private customAudioUrls: string[] = [];
   private currentQueueIndex = 0;
   private openingTimer: number | null = null;
   
@@ -96,6 +98,9 @@ export class AudioEngine {
       this.quranAudioElement.addEventListener('ended', this.handleSurahEnded);
       this.quranAudioElement.addEventListener('error', this.handleAudioError);
       this.quranAudioElement.addEventListener('timeupdate', this.handleTimeUpdate);
+      this.quranAudioElement.addEventListener('waiting', () => this.callbacks.onBufferingChange?.(true));
+      this.quranAudioElement.addEventListener('playing', () => this.callbacks.onBufferingChange?.(false));
+      this.quranAudioElement.addEventListener('canplay', () => this.callbacks.onBufferingChange?.(false));
     }
 
     if (this.audioCtx.state === 'suspended') {
@@ -160,7 +165,8 @@ export class AudioEngine {
     carrierHz: number,
     beatHz: number,
     surahNumbers: number[],
-    totalAyahs: number[] = [10]
+    totalAyahs: number[] = [10],
+    customAudioUrls?: string[]
   ) {
     this.initContext();
     if (!this.audioCtx) return;
@@ -171,6 +177,7 @@ export class AudioEngine {
     this.currentBeatHz = beatHz;
     this.surahQueue = surahNumbers;
     this.totalAyahsQueue = totalAyahs;
+    this.customAudioUrls = customAudioUrls || [];
     this.currentQueueIndex = 0;
     this.isQuranMuted = false;
     this.isFrequencyMuted = false;
@@ -189,12 +196,14 @@ export class AudioEngine {
     carrierHz: number,
     beatHz: number,
     surahNumbers: number[],
-    totalAyahs: number[] = [10]
+    totalAyahs: number[] = [10],
+    customAudioUrls?: string[]
   ) {
     this.currentCarrierHz = carrierHz;
     this.currentBeatHz = beatHz;
     this.surahQueue = surahNumbers;
     this.totalAyahsQueue = totalAyahs;
+    this.customAudioUrls = customAudioUrls || [];
     this.currentQueueIndex = 0;
 
     if (this.isPlaying && this.audioCtx) {
@@ -211,6 +220,31 @@ export class AudioEngine {
       if (!this.isOpening) {
         this.playCurrentSurah();
       }
+    }
+  }
+
+  /**
+   * Gentle 432 Hz Sine Ping Chime Cue for Guided Breathing phase transitions
+   */
+  public playChimeCue(freq = 432) {
+    if (!this.audioCtx) return;
+    try {
+      const now = this.audioCtx.currentTime;
+      const osc = this.audioCtx.createOscillator();
+      const gain = this.audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now);
+
+      gain.gain.setValueAtTime(0, now);
+      gain.gain.linearRampToValueAtTime(0.08, now + 0.04);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.85);
+
+      osc.connect(gain);
+      gain.connect(this.masterGain || this.audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.9);
+    } catch {
+      // ignore
     }
   }
 
@@ -379,7 +413,13 @@ export class AudioEngine {
     this.callbacks.onSurahChange?.(this.currentQueueIndex, surahNumber);
     this.callbacks.onAyahProgress?.(1, totalAyahs);
 
-    this.candidateUrls = this.getSurahCandidateUrls(surahNumber);
+    if (this.customAudioUrls && this.customAudioUrls.length > 0) {
+      const customUrl = this.customAudioUrls[this.currentQueueIndex % this.customAudioUrls.length];
+      this.candidateUrls = [customUrl, ...this.getSurahCandidateUrls(surahNumber)];
+    } else {
+      this.candidateUrls = this.getSurahCandidateUrls(surahNumber);
+    }
+
     this.currentCdnAttempt = 0;
     this.loadAndPlayCurrentCdn();
   }
@@ -443,7 +483,10 @@ export class AudioEngine {
 
   private handleSurahEnded = () => {
     if (!this.isPlaying) return;
-    this.currentQueueIndex = (this.currentQueueIndex + 1) % this.surahQueue.length;
+    const maxLen = this.customAudioUrls && this.customAudioUrls.length > 0
+      ? this.customAudioUrls.length
+      : this.surahQueue.length;
+    this.currentQueueIndex = (this.currentQueueIndex + 1) % maxLen;
     this.playCurrentSurah();
   };
 
