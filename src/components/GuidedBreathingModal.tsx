@@ -100,8 +100,11 @@ export const GuidedBreathingModal: React.FC<GuidedBreathingModalProps> = ({
   const progressRatio = Math.max(0, Math.min(1, (totalPhaseDuration - remainingTime) / totalPhaseDuration));
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
-      <div className="relative w-full max-w-md bg-[#0a1523]/95 border border-cyan-500/40 rounded-2xl p-6 shadow-[0_0_50px_rgba(34,211,238,0.25)] text-center overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
+      <div className="relative w-full max-w-md bg-[#0a1523]/95 border-t sm:border border-cyan-500/40 rounded-t-3xl sm:rounded-2xl p-5 sm:p-6 shadow-[0_0_50px_rgba(34,211,238,0.25)] text-center overflow-hidden max-h-[85vh] sm:max-h-none overflow-y-auto">
+        {/* Mobile Drag Indicator Handle */}
+        <div className="sm:hidden w-10 h-1 bg-white/20 rounded-full mx-auto mb-3 shrink-0" />
+
         {/* Glow ambient background element */}
         <div
           className="absolute -top-24 -left-24 w-48 h-48 rounded-full blur-3xl opacity-20 pointer-events-none transition-colors duration-700"

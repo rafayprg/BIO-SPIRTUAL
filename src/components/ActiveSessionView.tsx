@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { Mode } from '../data/modes';
-import { Play, Pause, Square } from 'lucide-react';
+import { Play, Pause, Square, Minimize2 } from 'lucide-react';
 
 interface ActiveSessionViewProps {
   mode: Mode;
@@ -12,6 +12,7 @@ interface ActiveSessionViewProps {
   onToggleQuran: () => void;
   onToggleFrequency: () => void;
   onEndSession: () => void;
+  onMinimize?: () => void;
 }
 
 export const ActiveSessionView: React.FC<ActiveSessionViewProps> = ({
@@ -24,6 +25,7 @@ export const ActiveSessionView: React.FC<ActiveSessionViewProps> = ({
   onToggleQuran,
   onToggleFrequency,
   onEndSession,
+  onMinimize,
 }) => {
   // Breathing Pacer state: Inhale (4s) -> Hold (4s) -> Exhale (6s) -> Hold (2s)
   const [breathPhase, setBreathPhase] = useState<'in' | 'hold1' | 'out' | 'hold2'>('in');
@@ -93,6 +95,18 @@ export const ActiveSessionView: React.FC<ActiveSessionViewProps> = ({
 
       {/* Top Header & Status */}
       <div className="relative z-10 w-full pt-4 sm:pt-6 px-4 flex flex-col items-center text-center">
+        {/* Minimize Button */}
+        {onMinimize && (
+          <button
+            onClick={onMinimize}
+            title="Minimize to Dashboard"
+            className="absolute top-4 right-4 sm:top-6 sm:right-6 px-3 py-1.5 rounded-full bg-slate-900/80 hover:bg-slate-800 border border-slate-700/80 text-[11px] font-orbitron font-semibold text-slate-300 hover:text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-md"
+          >
+            <span className="hidden sm:inline">Dashboard</span>
+            <Minimize2 className="w-3.5 h-3.5" />
+          </button>
+        )}
+
         <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold uppercase font-orbitron tracking-super-wide text-slate-100 drop-shadow-[0_0_15px_rgba(34,211,238,0.4)]">
           BIO SPIRITUAL HACKING
         </h1>

@@ -30,11 +30,11 @@ export const LiquidAudioDock: React.FC<LiquidAudioDockProps> = ({
   onOpenReader,
 }) => {
   return (
-    <div className="w-full liquid-glass rounded-2xl sm:rounded-full px-4 sm:px-6 py-3 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-3 select-none">
-      {/* Left: Play/Pause circular button + Track info */}
-      <div className="flex items-center gap-3.5 w-full md:w-auto justify-between md:justify-start">
-        <div className="flex items-center gap-3">
-          {/* Main Play/Pause Button */}
+    <div className="w-full liquid-glass rounded-2xl sm:rounded-full px-3.5 sm:px-6 py-2.5 sm:py-3 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-2.5 sm:gap-3 select-none border border-white/15">
+      {/* Row 1 on Mobile / Left on Desktop: Play/Pause circular button + Track info */}
+      <div className="flex items-center gap-2.5 sm:gap-3.5 w-full md:w-auto justify-between md:justify-start">
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+          {/* Main Play/Pause Button (44px min target) */}
           <button
             onClick={onTogglePlay}
             aria-label={isPlaying ? 'Stop session' : 'Start session'}
@@ -52,52 +52,61 @@ export const LiquidAudioDock: React.FC<LiquidAudioDockProps> = ({
           </button>
 
           {/* Mode & Streaming Status */}
-          <div className="text-left">
-            <div className="flex items-center gap-1.5 text-xs font-bold text-white">
-              <span>{currentMode.emoji} {currentMode.name}</span>
-              <span className="text-white/40">·</span>
-              <span className="text-cyan-300 font-mono text-[11px] font-semibold">
+          <div className="text-left min-w-0">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-white truncate">
+              <span className="truncate">{currentMode.emoji} {currentMode.name}</span>
+              <span className="text-white/40 shrink-0">·</span>
+              <span className="text-cyan-300 font-mono text-[11px] font-semibold shrink-0">
                 {currentMode.carrierHz}Hz / {currentMode.beatHz}Hz
               </span>
             </div>
 
-            <div className="text-[11px] text-white/50 flex items-center gap-1">
+            <div className="text-[10.5px] text-white/50 truncate">
               {isBuffering ? (
                 <span className="text-amber-300 font-medium flex items-center gap-1">
-                  <Sparkles className="w-3 h-3 animate-spin text-amber-400" />
+                  <Sparkles className="w-3 h-3 animate-spin text-amber-400 shrink-0" />
                   Buffering recitation...
                 </span>
               ) : isOpening ? (
                 <span className="text-amber-300 font-semibold flex items-center gap-1">
-                  <Sparkles className="w-3 h-3 animate-spin" />
-                  Golden Tone (432 · 576 · 699 Hz) &amp; Bismillah...
+                  <Sparkles className="w-3 h-3 animate-spin shrink-0" />
+                  Golden Tone 432 · Bismillah...
                 </span>
               ) : isPlaying ? (
                 <span className="text-emerald-400 font-medium">
                   Streaming Surah #{activeSurahNumber} (Mishary Alafasy)
                 </span>
               ) : (
-                <span>Ready to initialize dual-layer reset</span>
+                <span>Click Start Frequency to initialize</span>
               )}
             </div>
           </div>
         </div>
 
-        {/* Headphones badge */}
-        <div className="hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-full liquid-glass-pill text-[11px] text-teal-300">
+        {/* Headphones badge (Desktop only) */}
+        <div className="hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-full liquid-glass-pill text-[11px] text-teal-300 shrink-0">
           <Headphones className="w-3.5 h-3.5 text-teal-400 animate-pulse" />
           <span className="font-medium">Headphones Recommended</span>
         </div>
+
+        {/* Mobile Quick Reader Button in top row */}
+        <button
+          onClick={onOpenReader}
+          title="Read Arabic Quran & Translation"
+          className="md:hidden p-2 rounded-xl liquid-glass-pill text-amber-400 hover:bg-white/10 shrink-0 active:scale-95"
+        >
+          <BookOpen className="w-4 h-4" />
+        </button>
       </div>
 
-      {/* Right: Dual Custom Volume Sliders & Reader Button */}
-      <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end border-t md:border-t-0 border-white/10 pt-2.5 md:pt-0">
-        {/* Sliders Container */}
-        <div className="flex items-center gap-4">
+      {/* Row 2 on Mobile / Right on Desktop: Dual Volume Sliders */}
+      <div className="flex items-center gap-3 sm:gap-4 w-full md:w-auto justify-between md:justify-end border-t md:border-t-0 border-white/10 pt-2 md:pt-0">
+        {/* Sliders Container (Full width on mobile with wide touch handles) */}
+        <div className="flex items-center gap-3 sm:gap-4 w-full md:w-auto justify-around md:justify-end">
           {/* Frequency Volume */}
-          <div className="flex flex-col items-center">
-            <div className="flex items-center justify-between w-full text-[10px] font-mono text-cyan-300 font-bold mb-0.5">
-              <span>Hz</span>
+          <div className="flex flex-col items-center flex-1 md:flex-initial">
+            <div className="flex items-center justify-between w-full text-[10px] font-mono text-cyan-300 font-bold mb-0.5 px-0.5">
+              <span>Freq (Hz)</span>
               <span>{Math.round(binauralVolume * 100)}%</span>
             </div>
             <input
@@ -108,13 +117,13 @@ export const LiquidAudioDock: React.FC<LiquidAudioDockProps> = ({
               value={binauralVolume}
               onChange={(e) => onBinauralVolumeChange(parseFloat(e.target.value))}
               aria-label="Frequency Volume"
-              className="w-20 sm:w-24 h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-cyan-400"
+              className="w-full md:w-24 h-2 md:h-1.5 bg-white/15 rounded-lg appearance-none cursor-pointer accent-cyan-400"
             />
           </div>
 
           {/* Quran Volume */}
-          <div className="flex flex-col items-center">
-            <div className="flex items-center justify-between w-full text-[10px] font-mono text-amber-300 font-bold mb-0.5">
+          <div className="flex flex-col items-center flex-1 md:flex-initial">
+            <div className="flex items-center justify-between w-full text-[10px] font-mono text-amber-300 font-bold mb-0.5 px-0.5">
               <span>Quran</span>
               <span>{Math.round(quranVolume * 100)}%</span>
             </div>
@@ -126,16 +135,16 @@ export const LiquidAudioDock: React.FC<LiquidAudioDockProps> = ({
               value={quranVolume}
               onChange={(e) => onQuranVolumeChange(parseFloat(e.target.value))}
               aria-label="Quran Volume"
-              className="w-20 sm:w-24 h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-amber-400"
+              className="w-full md:w-24 h-2 md:h-1.5 bg-white/15 rounded-lg appearance-none cursor-pointer accent-amber-400"
             />
           </div>
         </div>
 
-        {/* Quick Read Quran Button */}
+        {/* Desktop Read Quran Button */}
         <button
           onClick={onOpenReader}
           title="Read Arabic Quran & Translation"
-          className="p-2 rounded-xl liquid-glass-pill hover:bg-white/15 text-white/80 hover:text-amber-300 transition-colors cursor-pointer"
+          className="hidden md:flex p-2 rounded-xl liquid-glass-pill hover:bg-white/15 text-white/80 hover:text-amber-300 transition-colors cursor-pointer shrink-0"
         >
           <BookOpen className="w-4 h-4 text-amber-400" />
         </button>

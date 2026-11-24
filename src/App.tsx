@@ -70,15 +70,15 @@ export const App: React.FC = () => {
     audioEngineRef.current?.setVolumes(binauralVolume, quranVolume);
   }, [binauralVolume, quranVolume]);
 
+  // Select a mode (Preview only - does NOT auto-start audio unless already playing)
   const handleSelectMode = (mode: Mode) => {
     setSelectedMode(mode);
     setActiveSurahIndex(0);
     setCurrentAyahIndex(0);
 
-    if (audioEngineRef.current) {
-      setIsQuranPlaying(true);
-      setIsFrequencyPlaying(true);
-      audioEngineRef.current.startSession(
+    // If an active session is currently running, hot-update frequencies & surah tracks
+    if (isPlaying && audioEngineRef.current) {
+      audioEngineRef.current.updateParameters(
         mode.carrierHz,
         mode.beatHz,
         mode.surahNumbers,
@@ -88,17 +88,30 @@ export const App: React.FC = () => {
     }
   };
 
-  const handleLaunchFullScreen = () => {
-    if (!isPlaying && audioEngineRef.current) {
+  // Explicitly Start Session -> Launches Audio & Fullscreen Sacred Geometry View
+  const handleStartSession = (modeToStart?: Mode) => {
+    const targetMode = modeToStart || selectedMode;
+    if (audioEngineRef.current) {
+      setIsQuranPlaying(true);
+      setIsFrequencyPlaying(true);
+      setIsPlaying(true);
       audioEngineRef.current.startSession(
-        selectedMode.carrierHz,
-        selectedMode.beatHz,
-        selectedMode.surahNumbers,
-        selectedMode.totalAyahs,
-        selectedMode.customAudioUrls
+        targetMode.carrierHz,
+        targetMode.beatHz,
+        targetMode.surahNumbers,
+        targetMode.totalAyahs,
+        targetMode.customAudioUrls
       );
     }
     setIsFullScreenSession(true);
+  };
+
+  const handleLaunchFullScreen = () => {
+    if (!isPlaying) {
+      handleStartSession(selectedMode);
+    } else {
+      setIsFullScreenSession(true);
+    }
   };
 
   const handleEndSession = () => {
@@ -111,7 +124,7 @@ export const App: React.FC = () => {
     if (isPlaying) {
       handleEndSession();
     } else {
-      handleSelectMode(selectedMode);
+      handleStartSession(selectedMode);
     }
   };
 
@@ -178,7 +191,7 @@ export const App: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen w-full flex p-3 sm:p-5 gap-5 relative text-white selection:bg-cyan-500/30 selection:text-cyan-200">
+    <div className="min-h-screen lg:h-screen lg:overflow-hidden w-full flex flex-col lg:flex-row p-2.5 sm:p-4 lg:p-5 gap-3.5 sm:gap-4 lg:gap-5 relative text-white selection:bg-cyan-500/30 selection:text-cyan-200 overflow-x-hidden max-w-full">
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed top-5 right-5 z-50 max-w-md bg-rose-950/90 border border-rose-500/50 text-rose-200 px-4 py-3 rounded-2xl shadow-xl text-xs backdrop-blur-md animate-fadeIn">
@@ -186,7 +199,7 @@ export const App: React.FC = () => {
         </div>
       )}
 
-      {/* 1. Glassy Sidebar V10 (Dual-Layer Floating Sidebar) */}
+      {/* 1. Glassy Sidebar V10 (Clean Dark Frosted Glass) */}
       <GlassySidebar
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
@@ -204,8 +217,8 @@ export const App: React.FC = () => {
         categoryCounts={categoryCounts}
       />
 
-      {/* 2. Main Workspace (Admin Dashboard V7 Layout) */}
-      <div className="flex-1 flex flex-col gap-5 min-w-0">
+      {/* 2. Main Workspace (Smooth Scrollable on Desktop, Fluid on Mobile) */}
+      <div className="flex-1 flex flex-col gap-3.5 sm:gap-4 min-w-0 lg:overflow-y-auto lg:overflow-x-hidden pr-0 lg:pr-1 pb-32 lg:pb-0">
         {/* Floating Liquid Glass Pill NavBar */}
         <LiquidNavbar
           onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -217,8 +230,68 @@ export const App: React.FC = () => {
           isBreathingActive={isBreathingModalOpen}
         />
 
+        {/* Mobile Horizontally Scrollable Category Chips Strip */}
+        <div className="lg:hidden flex items-center gap-2 overflow-x-auto scrollbar-none py-1 px-0.5 shrink-0 text-xs font-semibold">
+          <button
+            onClick={() => { setSelectedCategory('all'); setSelectedBandFilter(null); }}
+            className={`px-3 py-1.5 rounded-full whitespace-nowrap transition-all cursor-pointer ${
+              selectedCategory === 'all' && !selectedBandFilter
+                ? 'bg-cyan-500/25 text-cyan-200 border border-cyan-400/50 shadow-[0_0_12px_rgba(34,211,238,0.3)] font-bold'
+                : 'liquid-glass text-white/70 hover:text-white'
+            }`}
+          >
+            All Modes ({categoryCounts.all})
+          </button>
+          <button
+            onClick={() => { setSelectedCategory('calm-reset'); setSelectedBandFilter(null); }}
+            className={`px-3 py-1.5 rounded-full whitespace-nowrap transition-all cursor-pointer ${
+              selectedCategory === 'calm-reset'
+                ? 'bg-cyan-500/25 text-cyan-200 border border-cyan-400/50 font-bold'
+                : 'liquid-glass text-white/70 hover:text-white'
+            }`}
+          >
+            🧘 Calm & Reset ({categoryCounts['calm-reset']})
+          </button>
+          <button
+            onClick={() => { setSelectedCategory('protection'); setSelectedBandFilter(null); }}
+            className={`px-3 py-1.5 rounded-full whitespace-nowrap transition-all cursor-pointer ${
+              selectedCategory === 'protection'
+                ? 'bg-cyan-500/25 text-cyan-200 border border-cyan-400/50 font-bold'
+                : 'liquid-glass text-white/70 hover:text-white'
+            }`}
+          >
+            🛡️ Protection ({categoryCounts.protection})
+          </button>
+          <button
+            onClick={() => { setSelectedCategory('focus-rizq'); setSelectedBandFilter(null); }}
+            className={`px-3 py-1.5 rounded-full whitespace-nowrap transition-all cursor-pointer ${
+              selectedCategory === 'focus-rizq'
+                ? 'bg-cyan-500/25 text-cyan-200 border border-cyan-400/50 font-bold'
+                : 'liquid-glass text-white/70 hover:text-white'
+            }`}
+          >
+            ⚡ Focus & Rizq ({categoryCounts['focus-rizq']})
+          </button>
+          <button
+            onClick={() => { setSelectedCategory('sleep-healing'); setSelectedBandFilter(null); }}
+            className={`px-3 py-1.5 rounded-full whitespace-nowrap transition-all cursor-pointer ${
+              selectedCategory === 'sleep-healing'
+                ? 'bg-cyan-500/25 text-cyan-200 border border-cyan-400/50 font-bold'
+                : 'liquid-glass text-white/70 hover:text-white'
+            }`}
+          >
+            🌙 Sleep & Healing ({categoryCounts['sleep-healing']})
+          </button>
+          <button
+            onClick={() => setIsVerifiedSourcesOpen(true)}
+            className="px-3 py-1.5 rounded-full whitespace-nowrap transition-all cursor-pointer liquid-glass text-emerald-300 border border-emerald-500/30 font-semibold"
+          >
+            🧬 Science (15)
+          </button>
+        </div>
+
         {/* Main Dashboard Workspace Container */}
-        <div className="flex-1 w-full liquid-glass rounded-3xl p-4 sm:p-6 shadow-2xl flex flex-col gap-6">
+        <div className="w-full liquid-glass rounded-3xl p-3.5 sm:p-5 lg:p-6 shadow-2xl flex flex-col gap-5 sm:gap-6">
           {/* Header Row inside Dashboard */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-white/10 gap-2">
             <div>
@@ -235,7 +308,7 @@ export const App: React.FC = () => {
           </div>
 
           {/* 2-Column Asymmetric Studio + Bento Grid */}
-          <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 sm:gap-6 items-start">
             {/* Left Studio Column (col-span-5) */}
             <div className="xl:col-span-5 w-full">
               <StudioCard
@@ -253,7 +326,7 @@ export const App: React.FC = () => {
             </div>
 
             {/* Right Bento Column (col-span-7) */}
-            <div className="xl:col-span-7 w-full flex flex-col gap-4">
+            <div className="xl:col-span-7 w-full flex flex-col gap-3.5 sm:gap-4">
               <div className="flex items-center justify-between px-1">
                 <span className="text-xs font-bold text-white/70 uppercase tracking-wider font-orbitron">
                   {selectedCategory === 'all'
@@ -266,7 +339,7 @@ export const App: React.FC = () => {
                     ? 'Focus & Executive Clarity Modes'
                     : 'Restorative Sleep & Healing Modes'}
                 </span>
-                <span className="text-xs text-white/40">Select card to stream</span>
+                <span className="text-xs text-white/40">Select card to preview</span>
               </div>
 
               <BentoModeGrid
@@ -278,8 +351,8 @@ export const App: React.FC = () => {
             </div>
           </div>
 
-          {/* Floating Liquid Audio Dock (Bottom of Dashboard Container) */}
-          <div className="mt-2 pt-2">
+          {/* Liquid Audio Dock on Desktop */}
+          <div className="hidden lg:block mt-2 pt-2">
             <LiquidAudioDock
               currentMode={selectedMode}
               isPlaying={isPlaying}
@@ -297,7 +370,26 @@ export const App: React.FC = () => {
         </div>
       </div>
 
-      {/* Full-Screen Sacred Mandala View (when expanded) */}
+      {/* Floating Liquid Audio Dock on Mobile / Tablet (Fixed to bottom with safe-area support) */}
+      <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 p-2 sm:p-3 pointer-events-none">
+        <div className="pointer-events-auto max-w-lg mx-auto pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
+          <LiquidAudioDock
+            currentMode={selectedMode}
+            isPlaying={isPlaying}
+            isOpening={isOpening}
+            isBuffering={isBuffering}
+            activeSurahNumber={selectedMode.surahNumbers[activeSurahIndex] || selectedMode.surahNumbers[0]}
+            binauralVolume={binauralVolume}
+            quranVolume={quranVolume}
+            onTogglePlay={handleTogglePlay}
+            onBinauralVolumeChange={setBinauralVolume}
+            onQuranVolumeChange={setQuranVolume}
+            onOpenReader={() => setIsReaderOpen(true)}
+          />
+        </div>
+      </div>
+
+      {/* Full-Screen Sacred Mandala View (when started/expanded) */}
       {isFullScreenSession && (
         <ActiveSessionView
           mode={selectedMode}
@@ -309,6 +401,7 @@ export const App: React.FC = () => {
           onToggleQuran={handleToggleQuran}
           onToggleFrequency={handleToggleFrequency}
           onEndSession={handleEndSession}
+          onMinimize={() => setIsFullScreenSession(false)}
         />
       )}
 
