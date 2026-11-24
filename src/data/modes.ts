@@ -39,11 +39,11 @@ export interface Mode {
 }
 
 export const MODES: Mode[] = [
-  // 1. FEATURED: Crypto Trading
+  // 1. FEATURED: Calm & Cool
   {
     id: 'crypto-trading',
-    name: 'Crypto Trading: Calm & Cool',
-    emoji: '📈',
+    name: 'Calm & Cool',
+    emoji: '🧘',
     category: 'calm-reset',
     band: 'Alpha',
     beatHz: 10,
@@ -55,7 +55,7 @@ export const MODES: Mode[] = [
     totalAyahs: [5, 6],
     isFeatured: true,
     mandalaTheme: 'cyan-gold',
-    forText: 'Calm and cool under market pressure: no panic sells, no revenge trades, no impulsive entries.',
+    forText: 'Calm and cool under extreme pressure: emotional balance, mental composure, no panic reactions or impulsive decisions.',
     frequencyText: '432 Hz carrier · Alpha · 10 Hz beat (headphones)',
     openingText: "A'udhu billah + Bismillah over a golden-ratio 432 Hz tone (432 · 576 · 699 Hz = 1 : 4/3 : φ), before every surah",
     surahText: 'Al-Falaq + An-Nas [Makki] #113 + #114 · fades in · loops · Mishary Rashid Alafasy',

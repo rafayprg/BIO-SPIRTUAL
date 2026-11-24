@@ -18,8 +18,11 @@ export const VerifiedSourcesDrawer: React.FC<VerifiedSourcesDrawerProps> = ({
   const { verification } = mode;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
-      <div className="relative w-full max-w-lg bg-[#0c1929]/95 border border-slate-700/80 rounded-2xl p-5 sm:p-6 shadow-[0_0_50px_rgba(34,211,238,0.2)] text-left overflow-hidden max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
+      <div className="relative w-full max-w-lg bg-[#0c1929]/95 border-t sm:border border-slate-700/80 rounded-t-3xl sm:rounded-2xl p-5 sm:p-6 shadow-[0_0_50px_rgba(34,211,238,0.2)] text-left overflow-hidden max-h-[85vh] sm:max-h-[90vh] flex flex-col">
+        {/* Mobile Drag Indicator Handle */}
+        <div className="sm:hidden w-10 h-1 bg-white/20 rounded-full mx-auto mb-3 shrink-0" />
+
         {/* Top cyan-amber gradient glow */}
         <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-emerald-400 via-cyan-400 to-amber-400" />
 

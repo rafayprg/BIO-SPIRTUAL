@@ -131,11 +131,14 @@ export const QuranReaderModal: React.FC<QuranReaderModalProps> = ({
   });
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
       <div 
-        className="relative w-full max-w-3xl max-h-[90vh] bg-[#0c1827] border border-cyan-500/30 rounded-2xl shadow-cyan-glow-lg flex flex-col overflow-hidden text-left"
+        className="relative w-full max-w-3xl max-h-[88vh] sm:max-h-[90vh] bg-[#0c1827] border-t sm:border border-cyan-500/30 rounded-t-3xl sm:rounded-2xl shadow-cyan-glow-lg flex flex-col overflow-hidden text-left"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Mobile Drag Indicator Handle */}
+        <div className="sm:hidden w-10 h-1 bg-white/20 rounded-full mx-auto mt-2.5 mb-1 shrink-0" />
+
         {/* Golden-amber top accent */}
         <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-cyan-400 via-amber-400 to-cyan-400" />
 
