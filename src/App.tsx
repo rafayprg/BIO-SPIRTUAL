@@ -320,6 +320,7 @@ export const App: React.FC = () => {
                 onLaunchFullScreen={handleLaunchFullScreen}
                 onOpenSources={() => setIsVerifiedSourcesOpen(true)}
                 onOpenReader={() => setIsReaderOpen(true)}
+                onOpenBreathing={() => setIsBreathingModalOpen(true)}
                 onChimeCue={() => audioEngineRef.current?.playChimeCue(432)}
                 analyser={audioEngineRef.current?.getAnalyser() || null}
               />
