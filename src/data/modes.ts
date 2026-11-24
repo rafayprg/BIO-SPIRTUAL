@@ -1,3 +1,5 @@
+export type ModeCategory = 'calm-reset' | 'protection' | 'focus-rizq' | 'sleep-healing';
+
 export interface VerificationSource {
   islamicTag: 'Authentic Sunnah' | 'Quranic Theme';
   islamicCitation: string;
@@ -12,6 +14,7 @@ export interface Mode {
   name: string;
   arabicName?: string;
   emoji: string;
+  category: ModeCategory;
   band: 'Delta' | 'Theta' | 'Alpha' | 'SMR' | 'Beta' | 'Gamma' | 'Schumann';
   beatHz: number;
   carrierHz: number;
@@ -41,6 +44,7 @@ export const MODES: Mode[] = [
     id: 'crypto-trading',
     name: 'Crypto Trading: Calm & Cool',
     emoji: '📈',
+    category: 'calm-reset',
     band: 'Alpha',
     beatHz: 10,
     carrierHz: 432,
@@ -73,6 +77,7 @@ export const MODES: Mode[] = [
     name: 'Anger & Impulse Reset',
     arabicName: 'غصہ',
     emoji: '🔥',
+    category: 'calm-reset',
     band: 'Alpha',
     beatHz: 8,
     carrierHz: 432,
@@ -92,7 +97,7 @@ export const MODES: Mode[] = [
       "Say A'udhu billahi minash-shaytanir-rajeem (Sahih al-Bukhari 6115)",
       "Stay Silent immediately (Musnad Ahmad 2136)",
       "Change Posture — Sit if standing, lie down if sitting (Sunan Abi Dawud 4782)",
-      "Cool down with cold water (Practical Tip / Prophetic Wisdom)"
+      "Cool down with cold water (Classical Scholarly Practice)"
     ],
     customAudioUrls: [
       'https://cdn.islamic.network/quran/audio/128/ar.alafasy/427.mp3', // Ayah 3:134
@@ -114,6 +119,7 @@ export const MODES: Mode[] = [
     name: 'Waswasah & Overthinking Shield',
     arabicName: 'وسوسہ',
     emoji: '🛡️',
+    category: 'protection',
     band: 'Alpha',
     beatHz: 9,
     carrierHz: 432,
@@ -149,6 +155,7 @@ export const MODES: Mode[] = [
     name: 'Grief, Hardship & Sabr',
     arabicName: 'صبر',
     emoji: '🌧️',
+    category: 'sleep-healing',
     band: 'Theta',
     beatHz: 5.5,
     carrierHz: 432,
@@ -180,6 +187,7 @@ export const MODES: Mode[] = [
     name: 'Rizq, Tawakkul & Work Clarity',
     arabicName: 'رزق و توکل',
     emoji: '⚖️',
+    category: 'focus-rizq',
     band: 'SMR',
     beatHz: 14,
     carrierHz: 432,
@@ -210,6 +218,7 @@ export const MODES: Mode[] = [
     id: 'mind-reset',
     name: 'Mind Reset',
     emoji: '🧠',
+    category: 'calm-reset',
     band: 'Alpha',
     beatHz: 10,
     carrierHz: 432,
@@ -241,6 +250,7 @@ export const MODES: Mode[] = [
     name: 'Jealousy · Hasad',
     arabicName: 'حسد',
     emoji: '💚',
+    category: 'protection',
     band: 'Theta',
     beatHz: 6,
     carrierHz: 396,
@@ -272,6 +282,7 @@ export const MODES: Mode[] = [
     name: 'Gheebah · Backbiting',
     arabicName: 'غیبت',
     emoji: '🫠',
+    category: 'protection',
     band: 'Alpha',
     beatHz: 10,
     carrierHz: 432,
@@ -302,6 +313,7 @@ export const MODES: Mode[] = [
     id: 'motivation-energy',
     name: 'Motivation & Energy',
     emoji: '🚀',
+    category: 'focus-rizq',
     band: 'Beta',
     beatHz: 18,
     carrierHz: 432,
@@ -332,6 +344,7 @@ export const MODES: Mode[] = [
     id: 'focus-study',
     name: 'Focus & Study',
     emoji: '🎯',
+    category: 'focus-rizq',
     band: 'Gamma',
     beatHz: 40,
     carrierHz: 432,
@@ -362,6 +375,7 @@ export const MODES: Mode[] = [
     id: 'anxiety-calm',
     name: 'Anxiety & Calm',
     emoji: '😌',
+    category: 'calm-reset',
     band: 'Theta',
     beatHz: 6,
     carrierHz: 396,
@@ -392,6 +406,7 @@ export const MODES: Mode[] = [
     id: 'deep-sleep',
     name: 'Deep Sleep',
     emoji: '😴',
+    category: 'sleep-healing',
     band: 'Delta',
     beatHz: 2,
     carrierHz: 432,
@@ -422,6 +437,7 @@ export const MODES: Mode[] = [
     id: 'dhikr-meditation',
     name: 'Dhikr & Meditation',
     emoji: '📿',
+    category: 'sleep-healing',
     band: 'Theta',
     beatHz: 4,
     carrierHz: 432,
@@ -452,6 +468,7 @@ export const MODES: Mode[] = [
     id: 'love-connection',
     name: 'Love & Connection',
     emoji: '💖',
+    category: 'sleep-healing',
     band: 'Schumann',
     beatHz: 7.83,
     carrierHz: 528,
@@ -482,6 +499,7 @@ export const MODES: Mode[] = [
     id: 'healing-shifa',
     name: 'Healing & Shifa',
     emoji: '🌿',
+    category: 'sleep-healing',
     band: 'Schumann',
     beatHz: 7.83,
     carrierHz: 432,
