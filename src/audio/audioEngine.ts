@@ -6,6 +6,7 @@ export interface AudioEngineCallbacks {
   onSurahChange?: (surahIndex: number, surahNumber: number) => void;
   onAyahProgress?: (ayahIndex: number, totalAyahs: number) => void;
   onBufferingChange?: (isBuffering: boolean) => void;
+  onSurahCycleComplete?: () => void;
   onError?: (errorMessage: string) => void;
 }
 
@@ -273,6 +274,45 @@ export class AudioEngine {
     }
   }
 
+  /**
+   * Smooth 3-Second Audio Auto-Fade Out when session timer expires or Sunnah repetitions complete
+   */
+  public fadeStopSession(fadeDuration = 3, onComplete?: () => void) {
+    if (!this.isPlaying) {
+      this.stopSession();
+      onComplete?.();
+      return;
+    }
+
+    if (this.audioCtx && this.masterGain) {
+      const now = this.audioCtx.currentTime;
+      this.masterGain.gain.cancelScheduledValues(now);
+      this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now);
+      this.masterGain.gain.linearRampToValueAtTime(0.0001, now + fadeDuration);
+    }
+
+    const startQuranVol = this.quranAudioElement ? this.quranAudioElement.volume : 0;
+    const fadeSteps = 15;
+    const intervalTime = (fadeDuration * 1000) / fadeSteps;
+    let step = 0;
+
+    const fadeInterval = window.setInterval(() => {
+      step++;
+      const ratio = Math.max(0, 1 - step / fadeSteps);
+      if (this.quranAudioElement) {
+        this.quranAudioElement.volume = startQuranVol * ratio;
+      }
+      if (step >= fadeSteps) {
+        clearInterval(fadeInterval);
+        this.stopSession();
+        if (this.audioCtx && this.masterGain) {
+          this.masterGain.gain.setValueAtTime(1.0, this.audioCtx.currentTime);
+        }
+        onComplete?.();
+      }
+    }, intervalTime);
+  }
+
   private startBinauralBeat(carrierHz: number, beatHz: number) {
     if (!this.audioCtx || !this.channelMerger || !this.binauralGain) return;
 
@@ -486,7 +526,12 @@ export class AudioEngine {
     const maxLen = this.customAudioUrls && this.customAudioUrls.length > 0
       ? this.customAudioUrls.length
       : this.surahQueue.length;
-    this.currentQueueIndex = (this.currentQueueIndex + 1) % maxLen;
+    const nextIndex = (this.currentQueueIndex + 1) % maxLen;
+    if (nextIndex === 0) {
+      // Completed one full round of surahs in this mode
+      this.callbacks.onSurahCycleComplete?.();
+    }
+    this.currentQueueIndex = nextIndex;
     this.playCurrentSurah();
   };
 

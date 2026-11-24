@@ -90,12 +90,17 @@ export const BentoModeGrid: React.FC<BentoModeGridProps> = ({
 
             {/* Bottom Row: Metadata Line */}
             <div className="mt-3 pt-2.5 border-t border-white/5 flex items-center justify-between text-xs text-white/50 font-medium">
-              <span className="truncate max-w-[150px] text-white/70 font-normal">
+              <span className="truncate max-w-[120px] sm:max-w-[140px] text-white/70 font-normal">
                 📖 {mode.surahDisplay}
               </span>
-              <span className="font-mono text-cyan-300 font-semibold text-[11px] shrink-0">
-                {mode.beatHz} Hz
-              </span>
+              <div className="flex items-center gap-1.5 shrink-0">
+                <span className="text-[10px] px-2 py-0.5 rounded-full font-mono bg-cyan-500/10 text-cyan-300 border border-cyan-400/25">
+                  ⏱ {mode.sessionDefaults.durationBadge}
+                </span>
+                <span className="font-mono text-cyan-300 font-semibold text-[11px]">
+                  {mode.beatHz} Hz
+                </span>
+              </div>
             </div>
           </motion.div>
         );

@@ -11,7 +11,8 @@ import {
   ShieldCheck,
   BookOpen,
   Activity,
-  Radio
+  Radio,
+  Clock
 } from 'lucide-react';
 import type { Mode } from '../data/modes';
 
@@ -149,6 +150,9 @@ export const StudioCard: React.FC<StudioCardProps> = ({
 
         {/* Studio Gold Badge & Fullscreen Button */}
         <div className="flex items-center gap-2 shrink-0">
+          <span className="hidden xs:inline-flex px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-cyan-500/15 text-cyan-300 border border-cyan-400/30">
+            ⏱ {mode.sessionDefaults.durationBadge}
+          </span>
           <span className="px-2.5 py-0.5 rounded-full text-[10px] font-orbitron font-extrabold uppercase bg-amber-500/15 text-amber-300 border border-amber-400/30">
             Studio
           </span>
@@ -326,6 +330,14 @@ export const StudioCard: React.FC<StudioCardProps> = ({
               <div>
                 <span className="font-bold text-white/90">WHY THIS: </span>
                 <span className="text-white/70 leading-relaxed">{mode.whyThisText}</span>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-2">
+              <Clock className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
+              <div>
+                <span className="font-bold text-white/90">TIMING BASIS: </span>
+                <span className="text-white/70 leading-relaxed">{mode.sessionDefaults.timingGuidance}</span>
               </div>
             </div>
           </div>

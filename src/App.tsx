@@ -40,6 +40,11 @@ export const App: React.FC = () => {
   const [isVerifiedSourcesOpen, setIsVerifiedSourcesOpen] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  // Smart Session Timer & Authentic Sunnah Repetition Tracking
+  const [timerMode, setTimerMode] = useState<string>('default');
+  const [remainingTimerSeconds, setRemainingTimerSeconds] = useState<number>(MODES[0].sessionDefaults.defaultMinutes * 60);
+  const [currentSunnahIteration, setCurrentSunnahIteration] = useState<number>(1);
+
   const audioEngineRef = useRef<AudioEngine | null>(null);
 
   useEffect(() => {
@@ -54,6 +59,22 @@ export const App: React.FC = () => {
       onAyahProgress: (ayah) => {
         setCurrentAyahIndex(ayah);
       },
+      onSurahCycleComplete: () => {
+        setCurrentSunnahIteration((prev) => {
+          const next = prev + 1;
+          const targetRepeat = selectedMode.sessionDefaults.sunnahRepeatCount;
+          if (timerMode === 'sunnah' && targetRepeat && next > targetRepeat) {
+            // Authentic Sunnah repetition count finished -> smooth 3s auto-fade
+            audioEngineRef.current?.fadeStopSession(3, () => {
+              setIsPlaying(false);
+              setIsFullScreenSession(false);
+            });
+            setToastMessage('Session Complete · Authentic Sunnah Recitations Completed.');
+            setTimeout(() => setToastMessage(null), 6000);
+          }
+          return next;
+        });
+      },
       onError: (err) => {
         setToastMessage(err);
         setTimeout(() => setToastMessage(null), 6000);
@@ -63,18 +84,65 @@ export const App: React.FC = () => {
     return () => {
       audioEngineRef.current?.stopSession();
     };
-  }, []);
+  }, [selectedMode, timerMode]);
 
   // Sync volumes to Web Audio engine
   useEffect(() => {
     audioEngineRef.current?.setVolumes(binauralVolume, quranVolume);
   }, [binauralVolume, quranVolume]);
 
-  // Select a mode (Preview only - does NOT auto-start audio unless already playing)
+  // Live Session Countdown & 3s Smooth Auto-Fade Completion
+  useEffect(() => {
+    if (!isPlaying || timerMode === 'loop') return;
+
+    const timer = setInterval(() => {
+      setRemainingTimerSeconds((prev) => {
+        if (prev <= 1) {
+          // Smooth 3s auto-fade completion
+          audioEngineRef.current?.fadeStopSession(3, () => {
+            setIsPlaying(false);
+            setIsFullScreenSession(false);
+          });
+          setToastMessage('Session Complete · May it bring peace and barakah.');
+          setTimeout(() => setToastMessage(null), 6000);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [isPlaying, timerMode]);
+
+  // Change or override session timer preset
+  const handleSetTimerPreset = (preset: string) => {
+    setTimerMode(preset);
+    if (preset === 'default') {
+      setRemainingTimerSeconds(selectedMode.sessionDefaults.defaultMinutes * 60);
+    } else if (preset === '5m') {
+      setRemainingTimerSeconds(5 * 60);
+    } else if (preset === '15m') {
+      setRemainingTimerSeconds(15 * 60);
+    } else if (preset === '20m') {
+      setRemainingTimerSeconds(20 * 60);
+    } else if (preset === '30m') {
+      setRemainingTimerSeconds(30 * 60);
+    } else if (preset === 'sunnah') {
+      setCurrentSunnahIteration(1);
+      setRemainingTimerSeconds(selectedMode.sessionDefaults.defaultMinutes * 60);
+    }
+  };
+
+  // Select a mode (Preview only - automatically pre-sets smart defaults)
   const handleSelectMode = (mode: Mode) => {
     setSelectedMode(mode);
     setActiveSurahIndex(0);
     setCurrentAyahIndex(0);
+    setCurrentSunnahIteration(1);
+
+    if (timerMode === 'default' || timerMode === 'sunnah') {
+      setRemainingTimerSeconds(mode.sessionDefaults.defaultMinutes * 60);
+    }
 
     // If an active session is currently running, hot-update frequencies & surah tracks
     if (isPlaying && audioEngineRef.current) {
@@ -118,6 +186,8 @@ export const App: React.FC = () => {
     audioEngineRef.current?.stopSession();
     setIsPlaying(false);
     setIsFullScreenSession(false);
+    setRemainingTimerSeconds(selectedMode.sessionDefaults.defaultMinutes * 60);
+    setCurrentSunnahIteration(1);
   };
 
   const handleTogglePlay = () => {
@@ -362,6 +432,10 @@ export const App: React.FC = () => {
               activeSurahNumber={selectedMode.surahNumbers[activeSurahIndex] || selectedMode.surahNumbers[0]}
               binauralVolume={binauralVolume}
               quranVolume={quranVolume}
+              timerMode={timerMode}
+              remainingSeconds={remainingTimerSeconds}
+              currentSunnahIteration={currentSunnahIteration}
+              onSetTimerPreset={handleSetTimerPreset}
               onTogglePlay={handleTogglePlay}
               onBinauralVolumeChange={setBinauralVolume}
               onQuranVolumeChange={setQuranVolume}
@@ -382,6 +456,10 @@ export const App: React.FC = () => {
             activeSurahNumber={selectedMode.surahNumbers[activeSurahIndex] || selectedMode.surahNumbers[0]}
             binauralVolume={binauralVolume}
             quranVolume={quranVolume}
+            timerMode={timerMode}
+            remainingSeconds={remainingTimerSeconds}
+            currentSunnahIteration={currentSunnahIteration}
+            onSetTimerPreset={handleSetTimerPreset}
             onTogglePlay={handleTogglePlay}
             onBinauralVolumeChange={setBinauralVolume}
             onQuranVolumeChange={setQuranVolume}
@@ -399,6 +477,9 @@ export const App: React.FC = () => {
           currentAyahIndex={currentAyahIndex}
           isQuranPlaying={isQuranPlaying}
           isFrequencyPlaying={isFrequencyPlaying}
+          timerMode={timerMode}
+          remainingSeconds={remainingTimerSeconds}
+          currentSunnahIteration={currentSunnahIteration}
           onToggleQuran={handleToggleQuran}
           onToggleFrequency={handleToggleFrequency}
           onEndSession={handleEndSession}

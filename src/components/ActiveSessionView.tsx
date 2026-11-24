@@ -9,6 +9,9 @@ interface ActiveSessionViewProps {
   currentAyahIndex: number;
   isQuranPlaying: boolean;
   isFrequencyPlaying: boolean;
+  timerMode?: string;
+  remainingSeconds?: number;
+  currentSunnahIteration?: number;
   onToggleQuran: () => void;
   onToggleFrequency: () => void;
   onEndSession: () => void;
@@ -22,6 +25,9 @@ export const ActiveSessionView: React.FC<ActiveSessionViewProps> = ({
   currentAyahIndex,
   isQuranPlaying,
   isFrequencyPlaying,
+  timerMode,
+  remainingSeconds,
+  currentSunnahIteration,
   onToggleQuran,
   onToggleFrequency,
   onEndSession,
@@ -125,6 +131,15 @@ export const ActiveSessionView: React.FC<ActiveSessionViewProps> = ({
           <span className="text-[11px] text-slate-300 font-medium">
             Goal: <span className="text-cyan-300 font-semibold">{mode.name}</span> · {mode.band} · {mode.beatHz} Hz · 📖 {mode.surahDisplay}
           </span>
+
+          {remainingSeconds !== undefined && (
+            <>
+              <span className="hidden sm:inline text-slate-600">·</span>
+              <span className="text-[11px] font-mono font-bold text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-400/30">
+                ⏱ {timerMode === 'loop' ? '∞ Loop' : timerMode === 'sunnah' && mode.sessionDefaults.sunnahRepeatCount ? `Sunnah ${currentSunnahIteration || 1}/${mode.sessionDefaults.sunnahRepeatCount}` : `${Math.floor(remainingSeconds / 60)}:${(remainingSeconds % 60) < 10 ? '0' : ''}${remainingSeconds % 60} left`}
+              </span>
+            </>
+          )}
         </div>
       </div>
 
