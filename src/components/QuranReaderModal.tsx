@@ -28,6 +28,30 @@ interface SurahResponse {
 // In-memory cache to avoid redundant network calls
 const surahCache: Record<number, SurahResponse> = {};
 
+const SURAH_NAMES: Record<number, string> = {
+  1: 'Al-Fatiha',
+  2: 'Al-Baqarah',
+  3: "Ali 'Imran",
+  12: 'Yusuf',
+  30: 'Ar-Rum',
+  49: 'Al-Hujurat',
+  55: 'Ar-Rahman',
+  65: 'At-Talaq',
+  67: 'Al-Mulk',
+  73: 'Al-Muzzammil',
+  93: 'Ad-Duha',
+  94: 'Ash-Sharh',
+  96: "Al-'Alaq",
+  113: 'Al-Falaq',
+  114: 'An-Nas',
+};
+
+const TARGET_AYAHS_BY_MODE: Record<string, Record<number, number[]>> = {
+  'waswasah-shield': { 2: [255] },
+  'anger-impulse-reset': { 3: [134] },
+  'rizq-tawakkul-clarity': { 65: [2, 3] },
+};
+
 export const QuranReaderModal: React.FC<QuranReaderModalProps> = ({
   isOpen,
   onClose,
@@ -39,6 +63,8 @@ export const QuranReaderModal: React.FC<QuranReaderModalProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [copiedAyahNumber, setCopiedAyahNumber] = useState<number | null>(null);
+
+  const targetAyahs = TARGET_AYAHS_BY_MODE[mode.id]?.[activeSurahNumber];
 
   // Synchronize active surah when mode changes or modal opens
   useEffect(() => {
@@ -196,7 +222,7 @@ export const QuranReaderModal: React.FC<QuranReaderModalProps> = ({
                       : 'bg-slate-800/70 text-slate-300 hover:bg-slate-700/80 border border-slate-700'
                   }`}
                 >
-                  Surah #{sNum} {sNum === 113 ? 'Al-Falaq' : sNum === 114 ? 'An-Nas' : ''}
+                  Surah #{sNum} {SURAH_NAMES[sNum] ? `· ${SURAH_NAMES[sNum]}` : ''}
                 </button>
               ))}
             </div>
@@ -225,6 +251,22 @@ export const QuranReaderModal: React.FC<QuranReaderModalProps> = ({
 
         {/* Content Area */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+          {/* Target Focus Ayah Banner for Specific Single-Ayah Modes */}
+          {targetAyahs && !loading && !error && (
+            <div className="flex items-center justify-between p-3 rounded-2xl bg-amber-500/15 border border-amber-400/40 text-xs">
+              <span className="text-amber-200 font-semibold flex items-center gap-1.5">
+                <span>⭐ Mode Primary Focus:</span>
+                <span className="text-white font-bold">Ayah {targetAyahs.join(', ')}</span>
+              </span>
+              <button
+                onClick={() => setSearchQuery(searchQuery === targetAyahs[0].toString() ? '' : targetAyahs[0].toString())}
+                className="px-3 py-1 rounded-xl bg-amber-400 text-slate-950 font-bold hover:bg-amber-300 transition-colors cursor-pointer text-[11px] shadow-sm"
+              >
+                {searchQuery === targetAyahs[0].toString() ? 'Show All Ayahs' : 'Isolate Focus Verse'}
+              </button>
+            </div>
+          )}
+
           {loading && (
             <div className="py-20 flex flex-col items-center justify-center text-center gap-3">
               <Loader2 className="w-8 h-8 text-cyan-400 animate-spin" />
@@ -255,21 +297,36 @@ export const QuranReaderModal: React.FC<QuranReaderModalProps> = ({
           {/* Ayah List */}
           {!loading && !error && filteredAyahs && (
             <div className="space-y-4">
-              {filteredAyahs.map((ayah) => (
-                <div
-                  key={ayah.number}
-                  className="group relative p-4 rounded-xl bg-slate-900/50 hover:bg-slate-800/40 border border-slate-800 hover:border-slate-700 transition-all"
-                >
-                  <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-800/60">
-                    {/* Verse badge */}
-                    <div className="flex items-center gap-2">
-                      <span className="w-6 h-6 rounded-full bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 font-mono text-xs font-bold flex items-center justify-center">
-                        {ayah.numberInSurah}
-                      </span>
-                      <span className="text-[10px] text-slate-500 font-mono">
-                        Ayah #{ayah.number}
-                      </span>
-                    </div>
+              {filteredAyahs.map((ayah) => {
+                const isTarget = targetAyahs?.includes(ayah.numberInSurah);
+                return (
+                  <div
+                    key={ayah.number}
+                    className={`group relative p-4 rounded-xl transition-all ${
+                      isTarget
+                        ? 'bg-amber-950/25 border-2 border-amber-400/70 shadow-[0_0_20px_rgba(245,158,11,0.25)]'
+                        : 'bg-slate-900/50 hover:bg-slate-800/40 border border-slate-800 hover:border-slate-700'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-800/60">
+                      {/* Verse badge */}
+                      <div className="flex items-center gap-2">
+                        <span className={`w-6 h-6 rounded-full font-mono text-xs font-bold flex items-center justify-center ${
+                          isTarget
+                            ? 'bg-amber-400 text-slate-950 shadow-md'
+                            : 'bg-cyan-950/80 border border-cyan-500/40 text-cyan-300'
+                        }`}>
+                          {ayah.numberInSurah}
+                        </span>
+                        <span className="text-[10px] text-slate-500 font-mono">
+                          Ayah #{ayah.number}
+                        </span>
+                        {isTarget && (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-400/20 text-amber-300 border border-amber-400/50">
+                            ★ Primary Focus
+                          </span>
+                        )}
+                      </div>
 
                     {/* Copy action */}
                     <button
@@ -301,7 +358,8 @@ export const QuranReaderModal: React.FC<QuranReaderModalProps> = ({
                     {ayah.englishText}
                   </p>
                 </div>
-              ))}
+              );
+            })}
 
               {filteredAyahs.length === 0 && (
                 <div className="py-12 text-center text-slate-500 text-sm">
