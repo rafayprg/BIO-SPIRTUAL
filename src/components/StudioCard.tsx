@@ -142,7 +142,7 @@ export const StudioCard: React.FC<StudioCardProps> = ({
                 </span>
               ) : (
                 <>
-                  <span className="text-amber-300 font-mono font-bold">432 Hz Carrier</span>
+                  <span className="text-amber-300 font-mono font-bold">{mode.carrierHz} Hz Carrier</span>
                   <span>·</span>
                   <span className="text-cyan-300 font-mono font-semibold">{mode.band} {mode.beatHz} Hz</span>
                   <span>·</span>
@@ -237,7 +237,9 @@ export const StudioCard: React.FC<StudioCardProps> = ({
           <span className="text-xs sm:text-sm font-mono font-extrabold text-amber-300">
             {mode.carrierHz} Hz
           </span>
-          <span className="text-[9px] text-white/40">Golden φ 4:3</span>
+          <span className="text-[9px] text-white/40">
+            {mode.carrierHz === 432 ? 'Golden φ 4:3' : mode.carrierHz === 528 ? 'Solfeggio 528' : 'Solfeggio 396'}
+          </span>
         </div>
 
         <div className="p-2.5 rounded-2xl bg-white/[0.03] border border-white/10 flex flex-col items-center justify-center">

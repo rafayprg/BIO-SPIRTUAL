@@ -53,6 +53,7 @@ export const MODES: Mode[] = [
   {
     id: 'crypto-trading',
     name: 'Calm & Cool',
+    arabicName: 'سكينة',
     emoji: '🧘',
     category: 'calm-reset',
     band: 'Alpha',
@@ -67,7 +68,7 @@ export const MODES: Mode[] = [
     mandalaTheme: 'cyan-gold',
     forText: 'Calm and cool under extreme pressure: emotional balance, mental composure, no panic reactions or impulsive decisions.',
     frequencyText: '432 Hz carrier · Alpha · 10 Hz beat (headphones)',
-    openingText: "A'udhu billah + Bismillah over a golden-ratio 432 Hz tone (432 · 576 · 699 Hz = 1 : 4/3 : φ), before every surah",
+    openingText: "A'udhu billah + Bismillah over a golden-ratio 432 Hz tone (432 · 576 · 699 Hz = 1 : 4/3 : φ) at session launch, then continuous recitation",
     surahText: 'Al-Falaq + An-Nas [Makki] #113 + #114 · fades in · loops · Mishary Rashid Alafasy',
     whyThisText: 'Al-Falaq: refuge from "the darkness when it settles" and "the envier when he envies". An-Nas: refuge from "the whisperer who withdraws", the inner voice that says go all in, chase the pump, win it back. Recited morning and evening, they "suffice you against everything" (Abu Dawud 5082).',
     recommendedBreathing: 'box-breathing',
@@ -107,7 +108,7 @@ export const MODES: Mode[] = [
     mandalaTheme: 'rose',
     forText: 'Rapidly lowers physiological arousal, cools anger impulses, and activates self-restraint and emotional composure.',
     frequencyText: '432 Hz carrier · Alpha · 8 Hz beat (headphones)',
-    openingText: "A'udhu billah + Bismillah over a golden-ratio 432 Hz tone (432 · 576 · 699 Hz = 1 : 4/3 : φ), before every surah",
+    openingText: "A'udhu billah + Bismillah over a golden-ratio 432 Hz tone (432 · 576 · 699 Hz = 1 : 4/3 : φ) at session launch, then continuous recitation",
     surahText: "Surah Ali 'Imran (3:134) [Madani] #3 · fades in · loops · Mishary Rashid Alafasy",
     whyThisText: "Quran 3:134 praises 'al-kazimeenal-ghayz' (those who swallow their anger and pardon humanity), paired with Stanford-validated cyclic sighing to slow respiratory rate and restore parasympathetic control.",
     recommendedBreathing: 'cyclic-sighing',
@@ -118,13 +119,12 @@ export const MODES: Mode[] = [
       "Cool down with cold water (Classical Scholarly Practice)"
     ],
     customAudioUrls: [
-      'https://cdn.islamic.network/quran/audio/128/ar.alafasy/427.mp3', // Ayah 3:134
-      'https://cdn.mp3quran.net/audio/mishary-alafasy/r1/003.mp3'
+      'https://cdn.islamic.network/quran/audio/128/ar.alafasy/427.mp3' // Ayah 3:134 focused loop
     ],
     verification: {
       islamicTag: 'Authentic Sunnah',
       islamicCitation: "Surah Ali 'Imran 3:134, Sahih al-Bukhari 6115 (A'udhu billah), Musnad Ahmad 2136 (Silence), Sunan Abi Dawud 4782 (Change posture)",
-      islamicUrl: 'https://khidma.live/blog/anger-in-islam-how-to-control-your-temper-and-deal-with-an-angry-spouse',
+      islamicUrl: 'https://sunnah.com/bukhari:6115',
       scienceTag: 'Peer-Reviewed',
       scienceSummary: 'Stanford Cyclic Sighing RCT (Balban et al., 2023, Cell Reports Medicine): 5 minutes of cyclic sighing daily significantly downregulates sympathetic hyperarousal, lowers respiratory rate, and enhances immediate emotional regulation.',
       scienceUrl: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC9873947/'
@@ -157,7 +157,7 @@ export const MODES: Mode[] = [
     mandalaTheme: 'cyan',
     forText: 'Quiets intrusive thoughts, chronic overthinking loops, cognitive distortions, and nighttime anxiety.',
     frequencyText: '432 Hz carrier · Low Alpha · 9 Hz beat (headphones)',
-    openingText: "A'udhu billah + Bismillah over a golden-ratio 432 Hz tone (432 · 576 · 699 Hz = 1 : 4/3 : φ), before every surah",
+    openingText: "A'udhu billah + Bismillah over a golden-ratio 432 Hz tone (432 · 576 · 699 Hz = 1 : 4/3 : φ) at session launch, then continuous recitation",
     surahText: 'Ayat al-Kursi (2:255) → Surah An-Nas (#114) · seamless loop · Mishary Rashid Alafasy',
     whyThisText: 'Sahih al-Bukhari 5010 confirms Ayat al-Kursi as divine fortress against Shaytan until morning, paired with Surah An-Nas (sanctuary from al-waswas al-khannas) and a soothing 9 Hz Low Alpha tone.',
     recommendedBreathing: 'box-breathing',
@@ -201,14 +201,14 @@ export const MODES: Mode[] = [
     mandalaTheme: 'purple',
     forText: 'Deep emotional release, comforting a heavy heart, and cultivating Sabr-e-Jameel (dignified patience) during trials.',
     frequencyText: '432 Hz carrier · Theta · 5.5 Hz beat (headphones)',
-    openingText: "A'udhu billah + Bismillah over a golden-ratio 432 Hz tone (432 · 576 · 699 Hz = 1 : 4/3 : φ), before every surah",
+    openingText: "A'udhu billah + Bismillah over a golden-ratio 432 Hz tone (432 · 576 · 699 Hz = 1 : 4/3 : φ) at session launch, then continuous recitation",
     surahText: 'Surah Yusuf [Makki] #12 · fades in · loops · Mishary Rashid Alafasy',
     whyThisText: "Revealed during the Year of Sorrow ('Am al-Huzn) to console Prophet Muhammad ﷺ after painful loss, paired with Theta binaural beats shown in clinical studies to alleviate emotional distress.",
     recommendedBreathing: 'cyclic-sighing',
     verification: {
       islamicTag: 'Quranic Theme',
       islamicCitation: "Surah Yusuf 12:83–86 ('Innama ashku bath-thi wa huzni ilallah' - I only complain of my sorrow and grief to Allah)",
-      islamicUrl: 'https://bayyinah.com/what-surah-yusuf-teaches-about-beautiful-patience-and-grief/',
+      islamicUrl: 'https://quran.com/12/83-86',
       scienceTag: 'Peer-Reviewed',
       scienceSummary: 'Theta Binaural Beats & Anxiety Meta-Analysis (PMC12145584): Theta-band auditory entrainment (4–7 Hz) promotes deep emotional processing, downregulation of the limbic alarm system, and significant anxiety reduction.',
       scienceUrl: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC12145584/'
@@ -218,7 +218,7 @@ export const MODES: Mode[] = [
       "sunnahLabel": "Flexible (No Fixed Count)",
       "durationBadge": "25m · Reflect",
       "timingGuidance": "No fixed Sunnah count — full reflective listening + Theta (5.5 Hz).",
-      "timingSourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12597119/"
+      "timingSourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12145584/"
 }
   },
 
@@ -240,7 +240,7 @@ export const MODES: Mode[] = [
     mandalaTheme: 'cyan-gold',
     forText: 'Calm, alert executive focus and disciplined work without financial panic or scarcity mindset.',
     frequencyText: '432 Hz carrier · SMR / Low Beta · 14 Hz beat (headphones)',
-    openingText: "A'udhu billah + Bismillah over a golden-ratio 432 Hz tone (432 · 576 · 699 Hz = 1 : 4/3 : φ), before every surah",
+    openingText: "A'udhu billah + Bismillah over a golden-ratio 432 Hz tone (432 · 576 · 699 Hz = 1 : 4/3 : φ) at session launch, then continuous recitation",
     surahText: 'Surah At-Talaq (65:2–3) [Madani] #65 · fades in · loops · Mishary Rashid Alafasy',
     whyThisText: "Quran 65:2–3 guarantees provision from unexpected sources through taqwa and tawakkul ('Wa man yattaqillaha yaj'al lahu makhraja'), paired with Sensorimotor Rhythm (14 Hz) associated with calm executive alertness.",
     recommendedBreathing: 'box-breathing',
@@ -257,7 +257,7 @@ export const MODES: Mode[] = [
       "sunnahLabel": "Flexible (No Fixed Count)",
       "durationBadge": "20m · Focus",
       "timingGuidance": "No fixed Sunnah count — 20m SMR (14 Hz) calm executive clarity.",
-      "timingSourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12597119/"
+      "timingSourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11426047/"
 }
   },
 
@@ -265,6 +265,7 @@ export const MODES: Mode[] = [
   {
     id: 'mind-reset',
     name: 'Mind Reset',
+    arabicName: 'صفاء الذهن',
     emoji: '🧠',
     category: 'calm-reset',
     band: 'Alpha',
@@ -278,7 +279,7 @@ export const MODES: Mode[] = [
     mandalaTheme: 'cyan-gold',
     forText: 'Clears mental noise and brings relaxed, alert calm.',
     frequencyText: '432 Hz carrier · Alpha · 10 Hz beat (headphones)',
-    openingText: "A'udhu billah + Bismillah over a golden-ratio 432 Hz tone (432 · 576 · 699 Hz = 1 : 4/3 : φ), before every surah",
+    openingText: "A'udhu billah + Bismillah over a golden-ratio 432 Hz tone (432 · 576 · 699 Hz = 1 : 4/3 : φ) at session launch, then continuous recitation",
     surahText: 'Ar-Rahman [Madani] #55 · fades in · loops · Mishary Rashid Alafasy',
     whyThisText: "Its refrain \"Which of your Lord's favours will you deny?\" comes 31 times, resetting overstimulated dopamine pathways and restoring profound gratitude.",
     recommendedBreathing: 'box-breathing',
@@ -295,7 +296,7 @@ export const MODES: Mode[] = [
       "sunnahLabel": "Flexible (No Fixed Count)",
       "durationBadge": "20m · Loop",
       "timingGuidance": "No fixed Sunnah count — 20m optimal binaural exposure window (PMC12597119).",
-      "timingSourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12597119/"
+      "timingSourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11426047/"
 }
   },
 
@@ -317,7 +318,7 @@ export const MODES: Mode[] = [
     mandalaTheme: 'emerald',
     forText: "Cools envy, comparison and the burning feeling when someone else wins. Envy fires the brain's social-pain alarm (anterior cingulate cortex). We use a warm, low 396 Hz tone with a slow theta beat to settle that alarm, and the surah turns the feeling into refuge.",
     frequencyText: '396 Hz carrier · Theta · 6 Hz beat (headphones)',
-    openingText: "A'udhu billah + Bismillah over a golden-ratio 432 Hz tone (432 · 576 · 699 Hz = 1 : 4/3 : φ), before every surah",
+    openingText: "A'udhu billah + Bismillah over a golden-ratio 432 Hz tone (432 · 576 · 699 Hz = 1 : 4/3 : φ) at session launch, then continuous recitation",
     surahText: 'Al-Falaq [Makki] #113 · fades in · loops · Mishary Rashid Alafasy',
     whyThisText: 'Commands explicit refuge from the envier when he envies ("wa min sharri hasidin idha hasad"). Reframes the threat from the envier outside and cools the fire of envy inside.',
     recommendedBreathing: 'cyclic-sighing',
@@ -357,7 +358,7 @@ export const MODES: Mode[] = [
     mandalaTheme: 'amber',
     forText: 'Cleanses negative speech patterns, silences toxic gossip, and restores conscious spiritual integrity.',
     frequencyText: '432 Hz carrier · Alpha · 10 Hz beat (headphones)',
-    openingText: "A'udhu billah + Bismillah over a golden-ratio 432 Hz tone (432 · 576 · 699 Hz = 1 : 4/3 : φ), before every surah",
+    openingText: "A'udhu billah + Bismillah over a golden-ratio 432 Hz tone (432 · 576 · 699 Hz = 1 : 4/3 : φ) at session launch, then continuous recitation",
     surahText: 'Al-Hujurat [Madani] #49 · fades in · loops · Mishary Rashid Alafasy',
     whyThisText: 'Strikes at the root of social poison by likening backbiting to eating the flesh of one’s dead brother, cultivating empathy and mindful speech.',
     recommendedBreathing: 'box-breathing',
@@ -374,7 +375,7 @@ export const MODES: Mode[] = [
       "sunnahLabel": "Flexible (No Fixed Count)",
       "durationBadge": "15m · Reflect",
       "timingGuidance": "No fixed Sunnah count — 15m Alpha (10 Hz) mindful speech reset.",
-      "timingSourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12597119/"
+      "timingSourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10198548/"
 }
   },
 
@@ -382,6 +383,7 @@ export const MODES: Mode[] = [
   {
     id: 'motivation-energy',
     name: 'Motivation & Energy',
+    arabicName: 'عزيمة و همة',
     emoji: '🚀',
     category: 'focus-rizq',
     band: 'Beta',
@@ -395,7 +397,7 @@ export const MODES: Mode[] = [
     mandalaTheme: 'amber',
     forText: 'Dispels lethargy, lifts depressive fatigue, and ignites decisive purposeful action.',
     frequencyText: '432 Hz carrier · Beta · 18 Hz beat (headphones)',
-    openingText: "A'udhu billah + Bismillah over a golden-ratio 432 Hz tone (432 · 576 · 699 Hz = 1 : 4/3 : φ), before every surah",
+    openingText: "A'udhu billah + Bismillah over a golden-ratio 432 Hz tone (432 · 576 · 699 Hz = 1 : 4/3 : φ) at session launch, then continuous recitation",
     surahText: 'Ad-Duha [Makki] #93 · fades in · loops · Mishary Rashid Alafasy',
     whyThisText: '"Your Lord has not forsaken you, nor is He displeased" — breathes hope into barren seasons, renewing biological vigor and spiritual mission.',
     recommendedBreathing: 'box-breathing',
@@ -412,7 +414,7 @@ export const MODES: Mode[] = [
       "sunnahLabel": "Flexible (No Fixed Count)",
       "durationBadge": "15m · Boost",
       "timingGuidance": "No fixed Sunnah count — 15m Beta (18 Hz) uplift session.",
-      "timingSourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12597119/"
+      "timingSourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11426047/"
 }
   },
 
@@ -420,6 +422,7 @@ export const MODES: Mode[] = [
   {
     id: 'focus-study',
     name: 'Focus & Study',
+    arabicName: 'تركيز و دراسة',
     emoji: '🎯',
     category: 'focus-rizq',
     band: 'Gamma',
@@ -433,7 +436,7 @@ export const MODES: Mode[] = [
     mandalaTheme: 'cyan',
     forText: 'High-bandwidth cognitive synchronization, rapid memory encoding, and distraction-proof deep work flow.',
     frequencyText: '432 Hz carrier · Gamma · 40 Hz beat (headphones)',
-    openingText: "A'udhu billah + Bismillah over a golden-ratio 432 Hz tone (432 · 576 · 699 Hz = 1 : 4/3 : φ), before every surah",
+    openingText: "A'udhu billah + Bismillah over a golden-ratio 432 Hz tone (432 · 576 · 699 Hz = 1 : 4/3 : φ) at session launch, then continuous recitation",
     surahText: "Al-'Alaq [Makki] #96 · fades in · loops · Mishary Rashid Alafasy",
     whyThisText: 'The primordial command: "Iqra! Read in the name of your Lord who created", elevating intellect, learning, and disciplined focus.',
     recommendedBreathing: 'box-breathing',
@@ -450,7 +453,7 @@ export const MODES: Mode[] = [
       "sunnahLabel": "Flexible (No Fixed Count)",
       "durationBadge": "25m · Deep Work",
       "timingGuidance": "No fixed Sunnah count — 25m Gamma (40 Hz) focus block (start 5m before studying).",
-      "timingSourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12597119/"
+      "timingSourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10198548/"
 }
   },
 
@@ -458,6 +461,7 @@ export const MODES: Mode[] = [
   {
     id: 'anxiety-calm',
     name: 'Anxiety & Calm',
+    arabicName: 'شرح الصدر',
     emoji: '😌',
     category: 'calm-reset',
     band: 'Theta',
@@ -471,7 +475,7 @@ export const MODES: Mode[] = [
     mandalaTheme: 'emerald',
     forText: 'Melts stress, tension and overthinking.',
     frequencyText: '396 Hz carrier · Theta · 6 Hz beat (headphones)',
-    openingText: "A'udhu billah + Bismillah over a golden-ratio 432 Hz tone (432 · 576 · 699 Hz = 1 : 4/3 : φ), before every surah",
+    openingText: "A'udhu billah + Bismillah over a golden-ratio 432 Hz tone (432 · 576 · 699 Hz = 1 : 4/3 : φ) at session launch, then continuous recitation",
     surahText: 'Ash-Sharh [Makki] #94 · fades in · loops · Mishary Rashid Alafasy',
     whyThisText: '"Did We not expand for you your breast?" and "Verily, with hardship comes ease" — activates parasympathetic calm and relieves tightness in the chest.',
     recommendedBreathing: 'cyclic-sighing',
@@ -488,7 +492,7 @@ export const MODES: Mode[] = [
       "sunnahLabel": "Flexible (No Fixed Count)",
       "durationBadge": "20m · Calm",
       "timingGuidance": "No fixed Sunnah count — 20m Theta (6 Hz) anxiety reduction session (PMC12597119).",
-      "timingSourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12597119/"
+      "timingSourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12145584/"
 }
   },
 
@@ -496,6 +500,7 @@ export const MODES: Mode[] = [
   {
     id: 'deep-sleep',
     name: 'Deep Sleep',
+    arabicName: 'نوم عميق',
     emoji: '😴',
     category: 'sleep-healing',
     band: 'Delta',
@@ -509,7 +514,7 @@ export const MODES: Mode[] = [
     mandalaTheme: 'purple',
     forText: 'Induces restorative slow-wave delta sleep, subconscious defense, and restful biological healing.',
     frequencyText: '432 Hz carrier · Delta · 2 Hz beat (headphones)',
-    openingText: "A'udhu billah + Bismillah over a golden-ratio 432 Hz tone (432 · 576 · 699 Hz = 1 : 4/3 : φ), before every surah",
+    openingText: "A'udhu billah + Bismillah over a golden-ratio 432 Hz tone (432 · 576 · 699 Hz = 1 : 4/3 : φ) at session launch, then continuous recitation",
     surahText: 'Al-Mulk [Makki] #67 · fades in · loops · Mishary Rashid Alafasy',
     whyThisText: 'The canonical Sunnah protector before sleeping every night, guarding the soul and quietening nighttime restlessness.',
     recommendedBreathing: 'cyclic-sighing',
@@ -535,6 +540,7 @@ export const MODES: Mode[] = [
   {
     id: 'dhikr-meditation',
     name: 'Dhikr & Meditation',
+    arabicName: 'ذكر و تهجد',
     emoji: '📿',
     category: 'sleep-healing',
     band: 'Theta',
@@ -548,7 +554,7 @@ export const MODES: Mode[] = [
     mandalaTheme: 'cyan-gold',
     forText: 'Trance-like devotional absorption, heart presence, and prolonged nighttime spiritual contemplation (Qiyam).',
     frequencyText: '432 Hz carrier · Theta · 4 Hz beat (headphones)',
-    openingText: "A'udhu billah + Bismillah over a golden-ratio 432 Hz tone (432 · 576 · 699 Hz = 1 : 4/3 : φ), before every surah",
+    openingText: "A'udhu billah + Bismillah over a golden-ratio 432 Hz tone (432 · 576 · 699 Hz = 1 : 4/3 : φ) at session launch, then continuous recitation",
     surahText: 'Al-Muzzammil [Makki] #73 · fades in · loops · Mishary Rashid Alafasy',
     whyThisText: 'Command to stand at night and recite the Quran with measured rhythmic recitation (Tarteel).',
     recommendedBreathing: 'box-breathing',
@@ -565,7 +571,7 @@ export const MODES: Mode[] = [
       "sunnahLabel": "Flexible (No Fixed Count)",
       "durationBadge": "20m · Dhikr",
       "timingGuidance": "No fixed Sunnah count — 20m Theta (4 Hz) quiet contemplation.",
-      "timingSourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12597119/"
+      "timingSourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12145584/"
 }
   },
 
@@ -573,6 +579,7 @@ export const MODES: Mode[] = [
   {
     id: 'love-connection',
     name: 'Love & Connection',
+    arabicName: 'مودة و رحمة',
     emoji: '💖',
     category: 'sleep-healing',
     band: 'Schumann',
@@ -586,7 +593,7 @@ export const MODES: Mode[] = [
     mandalaTheme: 'purple',
     forText: 'Heals interpersonal friction, enhances empathy, warmth, and restores relational peace.',
     frequencyText: '528 Hz carrier · Schumann · 7.83 Hz beat (headphones)',
-    openingText: "A'udhu billah + Bismillah over a golden-ratio 432 Hz tone (432 · 576 · 699 Hz = 1 : 4/3 : φ), before every surah",
+    openingText: "A'udhu billah + Bismillah over a golden-ratio 432 Hz tone (432 · 576 · 699 Hz = 1 : 4/3 : φ) at session launch, then continuous recitation",
     surahText: 'Ar-Rum [Makki] #30 · fades in · loops · Mishary Rashid Alafasy',
     whyThisText: 'Highlights the divine sign of creating spouses that you may find tranquility, placing affection (Mawaddah) and mercy (Rahmah) between hearts.',
     recommendedBreathing: 'cyclic-sighing',
@@ -603,7 +610,7 @@ export const MODES: Mode[] = [
       "sunnahLabel": "Flexible (No Fixed Count)",
       "durationBadge": "15m · Calm",
       "timingGuidance": "No fixed Sunnah count — 15m 528 Hz + reflection on Mawaddah & Rahmah.",
-      "timingSourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12597119/"
+      "timingSourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10198548/"
 }
   },
 
@@ -611,6 +618,7 @@ export const MODES: Mode[] = [
   {
     id: 'healing-shifa',
     name: 'Healing & Shifa',
+    arabicName: 'شفاء و عافية',
     emoji: '🌿',
     category: 'sleep-healing',
     band: 'Schumann',
@@ -624,7 +632,7 @@ export const MODES: Mode[] = [
     mandalaTheme: 'emerald',
     forText: 'Cellular rejuvenation, biological reset, universal spiritual cure (Ash-Shifa), and Earth-resonance alignment.',
     frequencyText: '432 Hz carrier · Schumann · 7.83 Hz beat (headphones)',
-    openingText: "A'udhu billah + Bismillah over a golden-ratio 432 Hz tone (432 · 576 · 699 Hz = 1 : 4/3 : φ), before every surah",
+    openingText: "A'udhu billah + Bismillah over a golden-ratio 432 Hz tone (432 · 576 · 699 Hz = 1 : 4/3 : φ) at session launch, then continuous recitation",
     surahText: 'Al-Fatiha [Makki] #1 · fades in · loops · Mishary Rashid Alafasy',
     whyThisText: 'Known as "The Cure" (Ash-Shifa) and the greatest Surah in the Quran; recited for spiritual and physical wholeness.',
     recommendedBreathing: 'box-breathing',
